@@ -2,6 +2,10 @@
 
 #include <cstdint>
 
+/////////////////////////////////////////////////////////
+///////////////////// BOARD SQUARES /////////////////////
+/////////////////////////////////////////////////////////
+
 enum class File : uint8_t {
     A = 0,
     B = 1,
@@ -52,3 +56,52 @@ constexpr Rank RankOf(Square square) {
         static_cast<uint8_t>(square) >> 3
     );
 }
+
+
+
+
+//////////////////////////////////////////////////////////
+/////////////////////     PIECES     /////////////////////
+//////////////////////////////////////////////////////////
+
+enum class Color : uint8_t {
+    White = 0,
+    Black = 1
+};
+
+enum class PieceType : uint8_t {
+    King = 0,
+    Queen = 1,
+    Rook = 2,
+    Knight = 3,
+    Bishop = 4,
+    Pawn = 5
+};
+
+enum class Piece : uint8_t {
+    WhiteKing = 0,   BlackKing = 1,  
+    WhiteQueen = 2,  BlackQueen = 3, 
+    WhiteRook = 4,   BlackRook = 5,  
+    WhiteKnight = 6, BlackKnight = 7,
+    WhiteBishop = 8, BlackBishop = 9,
+    WhitePawn = 10,  BlackPawn = 11,  
+};
+
+constexpr Piece MakePiece(Color color, PieceType type) {
+    return static_cast<Piece>(
+        (static_cast<uint8_t>(type) << 1) | static_cast<uint8_t>(color)
+    );
+}
+
+constexpr Color ColorOf(Piece piece) {
+    return static_cast<Color>(
+        static_cast<uint8_t>(piece) & 1
+    );
+}
+
+constexpr PieceType PieceTypeOf(Piece piece) {
+    return static_cast<PieceType>(
+        static_cast<uint8_t>(piece) >> 1
+    );
+}
+
