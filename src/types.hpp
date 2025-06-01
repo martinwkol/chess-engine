@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cassert>
 
 /////////////////////////////////////////////////////////
 ///////////////////// BOARD SQUARES /////////////////////
@@ -39,19 +40,35 @@ enum class Square : uint8_t {
     H1 = 56, H2 = 57, H3 = 58, H4 = 59, H5 = 60, H6 = 61, H7 = 62, H8 = 63
 };
 
+constexpr bool IsValid(File file) {
+    return File::A <= file && file <= File::H;
+}
+
+constexpr bool IsValid(Rank rank) {
+    return Rank::R1 <= rank && rank <= Rank::R8;
+}
+
+constexpr bool IsValid(Square square) {
+    return Square::A1 <= square && square <= Square::H8;
+}
+
 constexpr Square MakeSquare(File file, Rank rank) {
+    assert(IsValid(file));
+    assert(IsValid(rank));
     return static_cast<Square>(
         (static_cast<uint8_t>(rank) << 3) | static_cast<uint8_t>(file)
     );
 }
 
 constexpr File FileOf(Square square) {
+    assert(IsValid(square));
     return static_cast<File>(
         static_cast<uint8_t>(square) & 7
     );
 }
 
 constexpr Rank RankOf(Square square) {
+    assert(IsValid(square));
     return static_cast<Rank>(
         static_cast<uint8_t>(square) >> 3
     );
@@ -87,19 +104,35 @@ enum class Piece : uint8_t {
     WhitePawn = 10,  BlackPawn = 11,  
 };
 
+constexpr bool IsValid(Color color) {
+    return Color::White <= color && color <= Color::Black;
+}
+
+constexpr bool IsValid(PieceType type) {
+    return PieceType::King <= type && type <= PieceType::Pawn;
+}
+
+constexpr bool IsValid(Piece piece) {
+    return Piece::WhiteKing <= piece && piece <= Piece::BlackPawn;
+}
+
 constexpr Piece MakePiece(Color color, PieceType type) {
+    assert(IsValid(color));
+    assert(IsValid(type));
     return static_cast<Piece>(
         (static_cast<uint8_t>(type) << 1) | static_cast<uint8_t>(color)
     );
 }
 
 constexpr Color ColorOf(Piece piece) {
+    assert(IsValid(piece));
     return static_cast<Color>(
         static_cast<uint8_t>(piece) & 1
     );
 }
 
 constexpr PieceType PieceTypeOf(Piece piece) {
+    assert(IsValid(piece));
     return static_cast<PieceType>(
         static_cast<uint8_t>(piece) >> 1
     );
