@@ -7,8 +7,7 @@
 ///////////////////// BOARD SQUARES /////////////////////
 /////////////////////////////////////////////////////////
 
-using BoardFileEnumType = uint8_t;
-enum class BoardFile : BoardFileEnumType {
+enum class BoardFile : uint8_t {
     A = 0,
     B = 1,
     C = 2,
@@ -19,8 +18,7 @@ enum class BoardFile : BoardFileEnumType {
     H = 7
 };
 
-using BoardRankEnumType = uint8_t;
-enum class BoardRank : BoardRankEnumType {
+enum class BoardRank : uint8_t {
     R1 = 0,
     R2 = 1,
     R3 = 2,
@@ -31,8 +29,7 @@ enum class BoardRank : BoardRankEnumType {
     R8 = 7
 };
 
-using SquareEnumType = uint8_t;
-enum class Square : SquareEnumType {
+enum class Square : uint8_t {
     A1 = 0,  A2 = 1,  A3 = 2,  A4 = 3,  A5 = 4,  A6 = 5,  A7 = 6,  A8 = 7,  
     B1 = 8,  B2 = 9,  B3 = 10, B4 = 11, B5 = 12, B6 = 13, B7 = 14, B8 = 15,
     C1 = 16, C2 = 17, C3 = 18, C4 = 19, C5 = 20, C6 = 21, C7 = 22, C8 = 23, 
@@ -59,21 +56,21 @@ constexpr Square MakeSquare(BoardFile file, BoardRank rank) {
     assert(IsValid(file));
     assert(IsValid(rank));
     return static_cast<Square>(
-        (static_cast<BoardRankEnumType>(rank) << 3) | static_cast<BoardFileEnumType>(file)
+        (static_cast<uint8_t>(rank) << 3) | static_cast<uint8_t>(file)
     );
 }
 
 constexpr BoardFile FileOf(Square square) {
     assert(IsValid(square));
     return static_cast<BoardFile>(
-        static_cast<SquareEnumType>(square) & 7
+        static_cast<uint8_t>(square) & 7
     );
 }
 
 constexpr BoardRank RankOf(Square square) {
     assert(IsValid(square));
     return static_cast<BoardRank>(
-        static_cast<SquareEnumType>(square) >> 3
+        static_cast<uint8_t>(square) >> 3
     );
 }
 
@@ -84,14 +81,12 @@ constexpr BoardRank RankOf(Square square) {
 /////////////////////     PIECES     /////////////////////
 //////////////////////////////////////////////////////////
 
-using ColorEnumType = uint8_t;
-enum class Color : ColorEnumType {
+enum class Color : uint8_t {
     White = 0,
     Black = 1
 };
 
-using PieceTypeEnumType = uint8_t;
-enum class PieceType : PieceTypeEnumType {
+enum class PieceType : uint8_t {
     King = 0,
     Queen = 1,
     Rook = 2,
@@ -100,8 +95,7 @@ enum class PieceType : PieceTypeEnumType {
     Pawn = 5
 };
 
-using PieceEnumType = uint8_t;
-enum class Piece : PieceEnumType {
+enum class Piece : uint8_t {
     WhiteKing = 0,   BlackKing = 1,  
     WhiteQueen = 2,  BlackQueen = 3, 
     WhiteRook = 4,   BlackRook = 5,  
@@ -126,21 +120,21 @@ constexpr Piece MakePiece(Color color, PieceType type) {
     assert(IsValid(color));
     assert(IsValid(type));
     return static_cast<Piece>(
-        (static_cast<PieceTypeEnumType>(type) << 1) | static_cast<ColorEnumType>(color)
+        (static_cast<uint8_t>(type) << 1) | static_cast<uint8_t>(color)
     );
 }
 
 constexpr Color ColorOf(Piece piece) {
     assert(IsValid(piece));
     return static_cast<Color>(
-        static_cast<PieceEnumType>(piece) & 1
+        static_cast<uint8_t>(piece) & 1
     );
 }
 
 constexpr PieceType PieceTypeOf(Piece piece) {
     assert(IsValid(piece));
     return static_cast<PieceType>(
-        static_cast<PieceEnumType>(piece) >> 1
+        static_cast<uint8_t>(piece) >> 1
     );
 }
 
