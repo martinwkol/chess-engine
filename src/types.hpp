@@ -7,7 +7,7 @@
 ///////////////////// BOARD SQUARES /////////////////////
 /////////////////////////////////////////////////////////
 
-enum class File : uint8_t {
+enum class BoardFile : uint8_t {
     A = 0,
     B = 1,
     C = 2,
@@ -18,7 +18,7 @@ enum class File : uint8_t {
     H = 7
 };
 
-enum class Rank : uint8_t {
+enum class BoardRank : uint8_t {
     R1 = 0,
     R2 = 1,
     R3 = 2,
@@ -40,19 +40,19 @@ enum class Square : uint8_t {
     H1 = 56, H2 = 57, H3 = 58, H4 = 59, H5 = 60, H6 = 61, H7 = 62, H8 = 63
 };
 
-constexpr bool IsValid(File file) {
-    return File::A <= file && file <= File::H;
+constexpr bool IsValid(BoardFile file) {
+    return BoardFile::A <= file && file <= BoardFile::H;
 }
 
-constexpr bool IsValid(Rank rank) {
-    return Rank::R1 <= rank && rank <= Rank::R8;
+constexpr bool IsValid(BoardRank rank) {
+    return BoardRank::R1 <= rank && rank <= BoardRank::R8;
 }
 
 constexpr bool IsValid(Square square) {
     return Square::A1 <= square && square <= Square::H8;
 }
 
-constexpr Square MakeSquare(File file, Rank rank) {
+constexpr Square MakeSquare(BoardFile file, BoardRank rank) {
     assert(IsValid(file));
     assert(IsValid(rank));
     return static_cast<Square>(
@@ -60,16 +60,16 @@ constexpr Square MakeSquare(File file, Rank rank) {
     );
 }
 
-constexpr File FileOf(Square square) {
+constexpr BoardFile FileOf(Square square) {
     assert(IsValid(square));
-    return static_cast<File>(
+    return static_cast<BoardFile>(
         static_cast<uint8_t>(square) & 7
     );
 }
 
-constexpr Rank RankOf(Square square) {
+constexpr BoardRank RankOf(Square square) {
     assert(IsValid(square));
-    return static_cast<Rank>(
+    return static_cast<BoardRank>(
         static_cast<uint8_t>(square) >> 3
     );
 }
