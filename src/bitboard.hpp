@@ -19,3 +19,51 @@ constexpr Bitboard SquareBB(Square square) {
     return 1ull << static_cast<std::underlying_type<Square>::type>(square);
 }
 
+inline Square Lsb(Bitboard bb) {
+    assert(bb);
+
+#if defined(__GNUC__) // gcc, clang, icx
+
+    return static_cast<Square>(__builtin_ctzll(bb));
+
+#elif defined(_MSC_VER)
+
+    #ifdef _WIN64  // MSVC, WIN64
+
+    unsigned long idx;
+    _BitScanForward64(&idx, bb);
+    return static_cast<Square>(idx);
+
+    #else // MSVC, WIN32
+
+    unsigned long idx;
+    if (bb & 0xFFFFFFFF) {
+        _BitScanForward(&idx, static_cast<uint32_t>(bb));
+    } else {
+        _BitScanForward(&idx, static_cast<uint32_t>(bb >> 32));
+        idx += 32;
+    }
+    return static_cast<Square>(idx);
+
+    #endif
+
+#else
+
+    #error "Compiler not supported"
+
+#endif 
+}
+
+
+inline Bitboard LsbBB(Bitboard bb) {
+    assert(bb);
+    return bb & -bb;
+}
+
+
+inline Square PopLsb(Bitboard& bb) {
+    assert(bb);
+    Square sq = Lsb(bb);
+    bb &= bb - 1;
+    return sq;
+}
