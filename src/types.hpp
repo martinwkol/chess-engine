@@ -1,6 +1,8 @@
 #pragma once
 
-enum class File {
+#include <cstdint>
+
+enum class File : uint8_t {
     A = 0,
     B = 1,
     C = 2,
@@ -11,7 +13,7 @@ enum class File {
     H = 7
 };
 
-enum class Rank {
+enum class Rank : uint8_t {
     R1 = 0,
     R2 = 1,
     R3 = 2,
@@ -22,7 +24,7 @@ enum class Rank {
     R8 = 7
 };
 
-enum class Square {
+enum class Square : uint8_t {
     A1 = 0,  A2 = 1,  A3 = 2,  A4 = 3,  A5 = 4,  A6 = 5,  A7 = 6,  A8 = 7,  
     B1 = 8,  B2 = 9,  B3 = 10, B4 = 11, B5 = 12, B6 = 13, B7 = 14, B8 = 15,
     C1 = 16, C2 = 17, C3 = 18, C4 = 19, C5 = 20, C6 = 21, C7 = 22, C8 = 23, 
@@ -33,4 +35,20 @@ enum class Square {
     H1 = 56, H2 = 57, H3 = 58, H4 = 59, H5 = 60, H6 = 61, H7 = 62, H8 = 63
 };
 
+constexpr Square MakeSquare(File file, Rank rank) {
+    return static_cast<Square>(
+        static_cast<uint8_t>(file) + static_cast<uint8_t>(rank) * 8
+    );
+}
 
+constexpr File FileOf(Square square) {
+    return static_cast<File>(
+        static_cast<uint8_t>(square) & 7
+    );
+}
+
+constexpr Rank RankOf(Square square) {
+    return static_cast<Rank>(
+        static_cast<uint8_t>(square) >> 3
+    );
+}
