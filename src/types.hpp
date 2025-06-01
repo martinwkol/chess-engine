@@ -41,7 +41,7 @@ enum class Square : uint8_t {
 
 constexpr Square MakeSquare(File file, Rank rank) {
     return static_cast<Square>(
-        static_cast<uint8_t>(file) + static_cast<uint8_t>(rank) * 8
+        (static_cast<uint8_t>(rank) << 3) | static_cast<uint8_t>(file)
     );
 }
 
