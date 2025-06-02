@@ -7,6 +7,7 @@
 ///////////////////// BOARD SQUARES /////////////////////
 /////////////////////////////////////////////////////////
 
+constexpr uint8_t BOARD_FILE_NUM = 8;
 enum class BoardFile : uint8_t {
     A = 0,
     B = 1,
@@ -18,6 +19,7 @@ enum class BoardFile : uint8_t {
     H = 7
 };
 
+constexpr uint8_t BOARD_RANK_NUM = 8;
 enum class BoardRank : uint8_t {
     R1 = 0,
     R2 = 1,
@@ -29,6 +31,7 @@ enum class BoardRank : uint8_t {
     R8 = 7
 };
 
+constexpr uint8_t SQUARE_NUM = 64;
 enum class Square : uint8_t {
     A1 = 0,  A2 = 1,  A3 = 2,  A4 = 3,  A5 = 4,  A6 = 5,  A7 = 6,  A8 = 7,  
     B1 = 8,  B2 = 9,  B3 = 10, B4 = 11, B5 = 12, B6 = 13, B7 = 14, B8 = 15,
@@ -81,11 +84,13 @@ constexpr BoardRank RankOf(Square square) {
 /////////////////////     PIECES     /////////////////////
 //////////////////////////////////////////////////////////
 
+constexpr uint8_t COLOR_NUM = 2;
 enum class Color : uint8_t {
     White = 0,
     Black = 1
 };
 
+constexpr uint8_t PIECE_TYPE_NUM = 6;
 enum class PieceType : uint8_t {
     King = 0,
     Queen = 1,
@@ -95,6 +100,7 @@ enum class PieceType : uint8_t {
     Pawn = 5
 };
 
+constexpr uint8_t PIECE_NUM = 12;
 enum class Piece : uint8_t {
     WhiteKing = 0,   BlackKing = 1,  
     WhiteQueen = 2,  BlackQueen = 3, 
