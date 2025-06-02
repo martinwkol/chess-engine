@@ -7,8 +7,8 @@
 /////////////////////   DIRECTION   /////////////////////
 /////////////////////////////////////////////////////////
 
-constexpr uint8_t DIRECTIONS_NUM = 8;
-enum class Directions {
+constexpr uint8_t DIRECTION_NUM = 8;
+enum class Direction {
     UP,
     UP_RIGHT,
     RIGHT,
