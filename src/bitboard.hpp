@@ -12,7 +12,7 @@ constexpr Bitboard FileBB(BoardFile file) {
 }
 
 constexpr Bitboard RankBB(BoardRank rank) {
-    return 0x0101010101010101 << static_cast<std::underlying_type<BoardRank>::type>(rank);
+    return 0x0101010101010101ull << static_cast<std::underlying_type<BoardRank>::type>(rank);
 }
 
 constexpr Bitboard SquareBB(Square square) {
