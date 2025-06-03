@@ -27,7 +27,7 @@ namespace {
 }
 
 bool BBOp::initialized = false;
-Bitboard BBOp::pseudoAttacks[PIECE_NUM][SQUARE_NUM];
+Bitboard BBOp::pseudoAttacks[PIECE_TYPE_NUM][SQUARE_NUM];
 BBOp::Magic BBOp::rookAttacks[SQUARE_NUM];
 BBOp::Magic BBOp::bishopAttacks[SQUARE_NUM];
 
