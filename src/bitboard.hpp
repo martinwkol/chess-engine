@@ -6,21 +6,43 @@
 
 using Bitboard = uint64_t;
 
-constexpr Bitboard FileBB(BoardFile file) {
+/**
+ * Static class for bitboard operations
+ */
+class BBOp {
+public:
+    static void Init();
+
+    static constexpr Bitboard FileBB(BoardFile file);
+    static constexpr Bitboard RankBB(BoardRank rank);
+    static constexpr Bitboard SquareBB(Square square);
+
+    template <Direction dir>
+    static constexpr Bitboard Shift(Bitboard bb);
+
+    static Bitboard LsbBB(Bitboard bb);
+    static Square Lsb(Bitboard bb);
+    static Square PopLsb(Bitboard& bb);
+
+    BBOp() = delete;
+
+};
+
+constexpr Bitboard BBOp::FileBB(BoardFile file) {
     constexpr Bitboard FILE_A = (1 << 8) - 1;
     return FILE_A << (static_cast<std::underlying_type<BoardFile>::type>(file) * 8);
 }
 
-constexpr Bitboard RankBB(BoardRank rank) {
+constexpr Bitboard BBOp::RankBB(BoardRank rank) {
     return 0x0101010101010101ull << static_cast<std::underlying_type<BoardRank>::type>(rank);
 }
 
-constexpr Bitboard SquareBB(Square square) {
+constexpr Bitboard BBOp::SquareBB(Square square) {
     return 1ull << static_cast<std::underlying_type<Square>::type>(square);
 }
 
 template <Direction dir>
-constexpr Bitboard Shift(Bitboard bb) {
+constexpr Bitboard BBOp::Shift(Bitboard bb) {
     constexpr bool ShiftsUp     = dir == Direction::UP || dir == Direction::UP_LEFT || dir == Direction::UP_RIGHT;
     constexpr bool ShiftsDown   = dir == Direction::DOWN || dir == Direction::DOWN_LEFT || dir == Direction::DOWN_RIGHT;
     constexpr bool ShiftsRight  = dir == Direction::RIGHT || dir == Direction::UP_RIGHT || dir == Direction::DOWN_RIGHT;
@@ -33,7 +55,7 @@ constexpr Bitboard Shift(Bitboard bb) {
     return bb;
 }
 
-inline Square Lsb(Bitboard bb) {
+inline Square BBOp::Lsb(Bitboard bb) {
     assert(bb);
 
 #if defined(__GNUC__) // gcc, clang, icx
@@ -69,13 +91,13 @@ inline Square Lsb(Bitboard bb) {
 }
 
 
-inline Bitboard LsbBB(Bitboard bb) {
+inline Bitboard BBOp::LsbBB(Bitboard bb) {
     assert(bb);
     return bb & -bb;
 }
 
 
-inline Square PopLsb(Bitboard& bb) {
+inline Square BBOp::PopLsb(Bitboard& bb) {
     assert(bb);
     Square sq = Lsb(bb);
     bb &= bb - 1;
