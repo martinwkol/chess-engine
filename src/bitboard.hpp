@@ -20,6 +20,7 @@ public:
     template <Direction dir>
     static constexpr Bitboard Shift(Bitboard bb);
 
+    static uint32_t Count1s(Bitboard bb);
     static Bitboard LsbBB(Bitboard bb);
     static Square Lsb(Bitboard bb);
     static Square PopLsb(Bitboard& bb);
@@ -71,6 +72,11 @@ constexpr Bitboard BB::Shift(Bitboard bb) {
     return bb;
 }
 
+
+inline uint32_t BB::Count1s(Bitboard bb) {
+    return __builtin_popcountll(bb);
+}
+
 inline Square BB::Lsb(Bitboard bb) {
     assert(bb);
 
@@ -106,12 +112,11 @@ inline Square BB::Lsb(Bitboard bb) {
 #endif 
 }
 
-
-inline Bitboard BB::LsbBB(Bitboard bb) {
+inline Bitboard BB::LsbBB(Bitboard bb)
+{
     assert(bb);
     return bb & -bb;
 }
-
 
 inline Square BB::PopLsb(Bitboard& bb) {
     assert(bb);
