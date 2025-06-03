@@ -107,7 +107,79 @@ void BB::InitPseudoAttacks() {
     }
 }
 
+/**
+ * A bad random number generator for 64-bit numbers
+ */
+static uint64_t rnd64() {
+    static uint64_t state = 1;
+    constexpr uint64_t z = 0x9FB21C651E98DF25;
+
+    uint64_t n = state++;
+    n ^= ((n << 49) | (n >> 15)) ^ ((n << 24) | (n >> 40));
+    n *= z;
+    n ^= n >> 35;
+    n *= z;
+    n ^= n >> 28;
+
+    return n;
+}
+
+void BB::InitMagicBitboards() {
+    Bitboard* table = attacksTable;
+    using SquareInt = std::underlying_type<Square>::type;
+    for (SquareInt sqInt = 0; sqInt < SQUARE_NUM; sqInt++) {
+        Square square = static_cast<Square>(sqInt);
+        table = InitMagicBitboards(PieceType::Rook, square, table);
+    }
+    for (SquareInt sqInt = 0; sqInt < SQUARE_NUM; sqInt++) {
+        Square square = static_cast<Square>(sqInt);
+        table = InitMagicBitboards(PieceType::Bishop, square, table);
+    }
+}
+
+Bitboard* BB::InitMagicBitboards(PieceType pieceType, Square square, Bitboard* tableStart) {
+    const auto pieceTypeInt = static_cast<std::underlying_type<PieceType>::type>(pieceType);
+    const auto squareInt = static_cast<std::underlying_type<Square>::type>(square);
+    const Bitboard squareBB = SquareBB(square);
+    const uint8_t* numBits = pieceType == PieceType::Rook ? rookBits : bishopBits;
+    const auto computeAttack = pieceType == PieceType::Rook ? ComputeRookAttack : ComputeBishopAttack;
+    Magic* attacks = pieceType == PieceType::Rook ? rookAttacks : bishopAttacks;
+
+    uint32_t used[1 << 12] = { 0 };
+    Bitboard mask = pseudoAttacks[pieceTypeInt][squareInt];
+    // Board edges are unnecessary for attacks (unless piece is itself on respective edge)
+    if (!(squareBB & FILE_A)) mask &= ~FILE_A;
+    if (!(squareBB & FILE_H)) mask &= ~FILE_H;
+    if (!(squareBB & RANK_1)) mask &= ~RANK_1;
+    if (!(squareBB & RANK_8)) mask &= ~RANK_8;
+    
+    attacks->table = tableStart;
+    attacks->mask = mask;
+    attacks->shift = 64 - numBits[squareInt];
+
+    for (uint32_t round = 1; round < UINT32_MAX; round++) {
+        attacks->mult = rnd64();
+
+        bool overlap = false;
+        for (Bitboard occupancy = mask; occupancy && !overlap; occupancy = (occupancy - 1) & mask) {
+            uint64_t index = attacks->TableIndex(occupancy);
+            if (used[index] != round) {
+                used[index] = round;
+                attacks->table[index] = computeAttack(square, occupancy);
+            } else {
+                overlap = true;
+            }
+        }
+
+        if (!overlap) return tableStart + (1 << numBits[squareInt]);
+    }
+
+    assert(false);
+    return nullptr;
+}
+
 void BB::Init() {
     InitPseudoAttacks();
+    InitMagicBitboards();
     initialized = true;
 }

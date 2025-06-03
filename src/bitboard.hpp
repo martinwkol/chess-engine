@@ -51,6 +51,14 @@ private:
         Bitboard mask;
         uint64_t mult;
         uint8_t shift;
+
+        uint64_t TableIndex(Bitboard occupancy) {
+            return ((occupancy & mask) * mult) >> shift;
+        }
+
+        Bitboard Attacks(Bitboard occupancy) {
+            return table[TableIndex(occupancy)];
+        }
     };
 
     static bool initialized;
@@ -60,6 +68,8 @@ private:
     static Magic bishopAttacks[SQUARE_NUM];
 
     static void InitPseudoAttacks();
+    static void InitMagicBitboards();
+    static Bitboard* InitMagicBitboards(PieceType pieceType, Square square, Bitboard* tableStart);
 
 };
 
