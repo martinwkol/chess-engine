@@ -44,6 +44,9 @@ public:
     static Bitboard AttacksBB(Square square, Bitboard occupancy);
     static Bitboard AttacksBB(PieceType pieceType, Square square);
     static Bitboard AttacksBB(PieceType pieceType, Square square, Bitboard occupancy);
+    template <Color color>
+    static constexpr Bitboard PawnAttacksBB(Square square);
+    static constexpr Bitboard PawnAttacksBB(Color color, Square square);
 
     static uint32_t Count1s(Bitboard bb);
     static Bitboard LsbBB(Bitboard bb);
@@ -134,6 +137,16 @@ inline Bitboard BB::AttacksBB(Square square, Bitboard occupancy) {
     }
 }
 
+template <Color color>
+constexpr Bitboard BB::PawnAttacksBB(Square square) {
+    constexpr Bitboard squareBB = SquareBB(square);
+    if constexpr (color == Color::White) {
+        return Shift<Direction::UP_LEFT>(squareBB) | Shift<Direction::UP_RIGHT>(squareBB);
+    } else {
+        return Shift<Direction::DOWN_LEFT>(squareBB) | Shift<Direction::DOWN_RIGHT>(squareBB);
+    }
+}
+
 inline Bitboard BB::AttacksBB(PieceType pieceType, Square square) {
     assert(pieceType != PieceType::Pawn);
     assert(initialized);
@@ -156,6 +169,15 @@ inline Bitboard BB::AttacksBB(PieceType pieceType, Square square, Bitboard occup
 
     default:
         return pseudoAttacks[ToInt(pieceType)][ToInt(square)];
+    }
+}
+
+inline constexpr Bitboard BB::PawnAttacksBB(Color color, Square square) {
+    const Bitboard squareBB = SquareBB(square);
+    if (color == Color::White) {
+        return Shift<Direction::UP_LEFT>(squareBB) | Shift<Direction::UP_RIGHT>(squareBB);
+    } else {
+        return Shift<Direction::DOWN_LEFT>(squareBB) | Shift<Direction::DOWN_RIGHT>(squareBB);
     }
 }
 
