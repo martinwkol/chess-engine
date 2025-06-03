@@ -74,15 +74,15 @@ private:
 };
 
 constexpr Bitboard BB::FileBB(BoardFile file) {
-    return FILE_A << (static_cast<std::underlying_type<BoardFile>::type>(file) * 8);
+    return FILE_A << (ToInt(file) * 8);
 }
 
 constexpr Bitboard BB::RankBB(BoardRank rank) {
-    return RANK_1 << static_cast<std::underlying_type<BoardRank>::type>(rank);
+    return RANK_1 << ToInt(rank);
 }
 
 constexpr Bitboard BB::SquareBB(Square square) {
-    return 1ull << static_cast<std::underlying_type<Square>::type>(square);
+    return 1ull << ToInt(square);
 }
 
 template <Direction dir>
@@ -109,7 +109,7 @@ inline Square BB::Lsb(Bitboard bb) {
 
 #if defined(__GNUC__) // gcc, clang, icx
 
-    return static_cast<Square>(__builtin_ctzll(bb));
+    return ToSquare(__builtin_ctzll(bb));
 
 #elif defined(_MSC_VER)
 
@@ -117,7 +117,7 @@ inline Square BB::Lsb(Bitboard bb) {
 
     unsigned long idx;
     _BitScanForward64(&idx, bb);
-    return static_cast<Square>(idx);
+    return ToSquare(idx);
 
     #else // MSVC, WIN32
 
@@ -128,7 +128,7 @@ inline Square BB::Lsb(Bitboard bb) {
         _BitScanForward(&idx, static_cast<uint32_t>(bb >> 32));
         idx += 32;
     }
-    return static_cast<Square>(idx);
+    return ToSquare(idx);
 
     #endif
 
