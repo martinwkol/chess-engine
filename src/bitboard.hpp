@@ -26,6 +26,19 @@ public:
 
     BBOp() = delete;
 
+private:
+    struct Magic {
+        Bitboard* table;
+        Bitboard mask;
+        uint64_t mult;
+        uint8_t shift;
+    };
+
+    static bool initialized;
+
+    static Magic rookAttacks[SQUARE_NUM];
+    static Magic bishopAttacks[SQUARE_NUM];
+
 };
 
 constexpr Bitboard BBOp::FileBB(BoardFile file) {
