@@ -163,7 +163,7 @@ Bitboard* BB::InitMagicBitboards(PieceType pieceType, Square square, Bitboard* t
         attacks.mult = rnd64_sparse();
 
         bool conflict = false;
-        for (Bitboard occupancy = mask; occupancy && !conflict; occupancy = (occupancy - 1) & mask) {
+        for (Bitboard occupancy = mask; !conflict; occupancy = (occupancy - 1) & mask) {
             uint64_t index = attacks.TableIndex(occupancy);
             Bitboard attack = computeAttack(square, occupancy);;
             if (used[index] != round) {
@@ -172,6 +172,7 @@ Bitboard* BB::InitMagicBitboards(PieceType pieceType, Square square, Bitboard* t
             } else if (attacks.table[index] != attack) {
                 conflict = true;
             }
+            if (!occupancy) break; // finished
         }
 
         if (!conflict) {
