@@ -36,7 +36,7 @@ private:
 
     static bool initialized;
 
-    static Bitboard pseudoAttacks[PIECE_NUM][SQUARE_NUM];
+    static Bitboard pseudoAttacks[PIECE_TYPE_NUM][SQUARE_NUM];
     static Magic rookAttacks[SQUARE_NUM];
     static Magic bishopAttacks[SQUARE_NUM];
 
