@@ -1,6 +1,7 @@
 #include "bitboard.hpp"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 namespace {
     const uint8_t rookBits[SQUARE_NUM] = {
@@ -113,17 +114,14 @@ void BB::InitPseudoAttacks() {
  * A bad random number generator for 64-bit numbers
  */
 static uint64_t rnd64() {
-    static uint64_t state = 1;
-    constexpr uint64_t z = 0x9FB21C651E98DF25;
+  uint64_t u1, u2, u3, u4;
+  u1 = (uint64_t)(random()) & 0xFFFF; u2 = (uint64_t)(random()) & 0xFFFF;
+  u3 = (uint64_t)(random()) & 0xFFFF; u4 = (uint64_t)(random()) & 0xFFFF;
+  return u1 | (u2 << 16) | (u3 << 32) | (u4 << 48);
+}
 
-    uint64_t n = state++;
-    n ^= ((n << 49) | (n >> 15)) ^ ((n << 24) | (n >> 40));
-    n *= z;
-    n ^= n >> 35;
-    n *= z;
-    n ^= n >> 28;
-
-    return n;
+static uint64_t rnd64_sparse() {
+  return rnd64() & rnd64() & rnd64();
 }
 
 void BB::InitMagicBitboards() {
@@ -145,7 +143,7 @@ Bitboard* BB::InitMagicBitboards(PieceType pieceType, Square square, Bitboard* t
     const Bitboard squareBB = SquareBB(square);
     const uint8_t* numBits = pieceType == PieceType::Rook ? rookBits : bishopBits;
     const auto computeAttack = pieceType == PieceType::Rook ? ComputeRookAttack : ComputeBishopAttack;
-    Magic* attacks = pieceType == PieceType::Rook ? rookAttacks : bishopAttacks;
+    Magic& attacks = pieceType == PieceType::Rook ? rookAttacks[squareInt] : bishopAttacks[squareInt];
 
     uint32_t used[1 << 12] = { 0 };
     Bitboard mask = pseudoAttacks[pieceTypeInt][squareInt];
@@ -155,25 +153,30 @@ Bitboard* BB::InitMagicBitboards(PieceType pieceType, Square square, Bitboard* t
     if (!(squareBB & RANK_1)) mask &= ~RANK_1;
     if (!(squareBB & RANK_8)) mask &= ~RANK_8;
     
-    attacks->table = tableStart;
-    attacks->mask = mask;
-    attacks->shift = 64 - numBits[squareInt];
+    attacks.table = tableStart;
+    attacks.mask = mask;
+    attacks.shift = 64 - numBits[squareInt];
 
-    for (uint32_t round = 1; round < UINT32_MAX; round++) {
-        attacks->mult = rnd64();
+    assert(Count1s(mask) == numBits[squareInt]);
 
-        bool overlap = false;
-        for (Bitboard occupancy = mask; occupancy && !overlap; occupancy = (occupancy - 1) & mask) {
-            uint64_t index = attacks->TableIndex(occupancy);
+    for (uint32_t round = 1; round < 1000000; round++) {
+        attacks.mult = rnd64_sparse();
+
+        bool conflict = false;
+        for (Bitboard occupancy = mask; occupancy && !conflict; occupancy = (occupancy - 1) & mask) {
+            uint64_t index = attacks.TableIndex(occupancy);
+            Bitboard attack = computeAttack(square, occupancy);;
             if (used[index] != round) {
                 used[index] = round;
-                attacks->table[index] = computeAttack(square, occupancy);
-            } else {
-                overlap = true;
+                attacks.table[index] = attack;
+            } else if (attacks.table[index] != attack) {
+                conflict = true;
             }
         }
 
-        if (!overlap) return tableStart + (1 << numBits[squareInt]);
+        if (!conflict) {
+            return tableStart + (1 << numBits[squareInt]);
+        }
     }
 
     assert(false);
@@ -191,10 +194,10 @@ int main() {
     printf("Rook\n");
     using SquareInt = std::underlying_type<Square>::type;
     for (SquareInt sqInt = 0; sqInt < SQUARE_NUM; sqInt++) {
-        printf("{ nullptr, 0x%lxULL, 0x%lxULL, %u }\n", BB::rookAttacks[sqInt].mask, BB::rookAttacks[sqInt].mult, BB::rookAttacks[sqInt].shift);
+        printf("{ nullptr, 0x%016lxULL, 0x%016lxULL, %u }\n", BB::rookAttacks[sqInt].mask, BB::rookAttacks[sqInt].mult, BB::rookAttacks[sqInt].shift);
     }
     printf("\n\nBishop\n");
     for (SquareInt sqInt = 0; sqInt < SQUARE_NUM; sqInt++) {
-        printf("{ nullptr, 0x%lxULL, 0x%lxULL, %u }\n", BB::bishopAttacks[sqInt].mask, BB::bishopAttacks[sqInt].mult, BB::bishopAttacks[sqInt].shift);
+        printf("{ nullptr, 0x%016lxULL, 0x%016lxULL, %u }\n", BB::bishopAttacks[sqInt].mask, BB::bishopAttacks[sqInt].mult, BB::bishopAttacks[sqInt].shift);
     }
 }
