@@ -88,3 +88,26 @@ static Bitboard ComputeKightAttack(Square square) {
         BBOp::Shift<Direction::DOWN>(dr)    |
         BBOp::Shift<Direction::RIGHT>(dr);
 }
+
+void BBOp::InitPseudoAttacks() {
+    using SquareInt = std::underlying_type<Square>::type;
+    for (SquareInt sqInt = 0; sqInt < SQUARE_NUM; sqInt++) {
+        Square square = static_cast<Square>(sqInt);
+        Bitboard kingAttack = ComputeKingAttack(square);
+        Bitboard rookAttack = ComputeRookAttack(square, 0);
+        Bitboard bishopAttack = ComputeBishopAttack(square, 0);
+        Bitboard knightAttack = ComputeKightAttack(square);
+
+        using PieceTypeInt = std::underlying_type<PieceType>::type;
+        pseudoAttacks[static_cast<PieceTypeInt>(PieceType::King)][sqInt]    = kingAttack;
+        pseudoAttacks[static_cast<PieceTypeInt>(PieceType::Queen)][sqInt]   = rookAttack | bishopAttack;
+        pseudoAttacks[static_cast<PieceTypeInt>(PieceType::Rook)][sqInt]    = rookAttack;
+        pseudoAttacks[static_cast<PieceTypeInt>(PieceType::Bishop)][sqInt]  = bishopAttack;
+        pseudoAttacks[static_cast<PieceTypeInt>(PieceType::Knight)][sqInt]  = knightAttack;
+    }
+}
+
+void BBOp::Init() {
+    InitPseudoAttacks();
+    initialized = true;
+}
