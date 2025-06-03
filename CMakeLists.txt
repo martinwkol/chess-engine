@@ -8,7 +8,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Source files
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(SOURCES
-    "${SRC_DIR}/main.cpp"
     "${SRC_DIR}/bitboard.cpp"
 )
 

@@ -1,5 +1,7 @@
 #include "bitboard.hpp"
 
+#include <stdio.h>
+
 namespace {
     const uint8_t rookBits[SQUARE_NUM] = {
         12, 11, 11, 11, 11, 11, 11, 12,
@@ -182,4 +184,17 @@ void BB::Init() {
     InitPseudoAttacks();
     InitMagicBitboards();
     initialized = true;
+}
+
+int main() {
+    BB::Init();
+    printf("Rook\n");
+    using SquareInt = std::underlying_type<Square>::type;
+    for (SquareInt sqInt = 0; sqInt < SQUARE_NUM; sqInt++) {
+        printf("{ nullptr, 0x%lxULL, 0x%lxULL, %u }\n", BB::rookAttacks[sqInt].mask, BB::rookAttacks[sqInt].mult, BB::rookAttacks[sqInt].shift);
+    }
+    printf("\n\nBishop\n");
+    for (SquareInt sqInt = 0; sqInt < SQUARE_NUM; sqInt++) {
+        printf("{ nullptr, 0x%lxULL, 0x%lxULL, %u }\n", BB::bishopAttacks[sqInt].mask, BB::bishopAttacks[sqInt].mult, BB::bishopAttacks[sqInt].shift);
+    }
 }

@@ -44,8 +44,7 @@ public:
     static Square PopLsb(Bitboard& bb);
 
     BB() = delete;
-
-private:
+    
     struct Magic {
         Bitboard* table;
         Bitboard mask;
