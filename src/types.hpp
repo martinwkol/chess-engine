@@ -75,6 +75,39 @@ constexpr bool IsValid(Square square) {
     return Square::A1 <= square && square <= Square::H8;
 }
 
+constexpr BoardFile ToBoardFile(uint8_t n) {
+    BoardFile file = static_cast<BoardFile>(n);
+    assert(IsValid(file));
+    return file;
+}
+
+constexpr uint8_t ToInt(BoardFile file) {
+    assert(IsValid(file));
+    return static_cast<uint8_t>(file);
+}
+
+constexpr BoardRank ToBoardRank(uint8_t n) {
+    BoardRank rank = static_cast<BoardRank>(n);
+    assert(IsValid(rank));
+    return rank;
+}
+
+constexpr uint8_t ToInt(BoardRank rank) {
+    assert(IsValid(rank));
+    return static_cast<uint8_t>(rank);
+}
+
+constexpr Square ToSquare(uint8_t n) {
+    Square square = static_cast<Square>(n);
+    assert(IsValid(square));
+    return square;
+}
+
+constexpr uint8_t ToInt(Square square) {
+    assert(IsValid(square));
+    return static_cast<uint8_t>(square);
+}
+
 constexpr Square MakeSquare(BoardFile file, BoardRank rank) {
     assert(IsValid(file));
     assert(IsValid(rank));
@@ -140,6 +173,39 @@ constexpr bool IsValid(PieceType type) {
 
 constexpr bool IsValid(Piece piece) {
     return Piece::WhiteKing <= piece && piece <= Piece::BlackPawn;
+}
+
+constexpr Color ToColor(uint8_t n) {
+    Color color = static_cast<Color>(n);
+    assert(IsValid(color));
+    return color;
+}
+
+constexpr uint8_t ToInt(Color color) {
+    assert(IsValid(color));
+    return static_cast<uint8_t>(color);
+}
+
+constexpr PieceType ToPieceType(uint8_t n) {
+    PieceType pieceType = static_cast<PieceType>(n);
+    assert(IsValid(pieceType));
+    return pieceType;
+}
+
+constexpr uint8_t ToInt(PieceType pieceType) {
+    assert(IsValid(pieceType));
+    return static_cast<uint8_t>(pieceType);
+}
+
+constexpr Piece ToPiece(uint8_t n) {
+    Piece piece = static_cast<Piece>(n);
+    assert(IsValid(piece));
+    return piece;
+}
+
+constexpr uint8_t ToInt(Piece piece) {
+    assert(IsValid(piece));
+    return static_cast<uint8_t>(piece);
 }
 
 constexpr Piece MakePiece(Color color, PieceType type) {
