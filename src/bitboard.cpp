@@ -27,6 +27,7 @@ namespace {
 }
 
 bool BBOp::initialized = false;
+Bitboard BBOp::pseudoAttacks[PIECE_NUM][SQUARE_NUM];
 BBOp::Magic BBOp::rookAttacks[SQUARE_NUM];
 BBOp::Magic BBOp::bishopAttacks[SQUARE_NUM];
 
@@ -40,6 +41,19 @@ static Bitboard SlideAttack(Square square, Bitboard occupancy) {
         bb |= squareBB;
         if (!squareBB || squareBB & occupancy) return bb;
     }
+}
+
+static Bitboard ComputeKingAttack(Square square) {
+    Bitboard squareBB = BBOp::SquareBB(square);
+    return
+        BBOp::Shift<Direction::UP>(squareBB)        |
+        BBOp::Shift<Direction::DOWN>(squareBB)      |
+        BBOp::Shift<Direction::LEFT>(squareBB)      |
+        BBOp::Shift<Direction::RIGHT>(squareBB)     |
+        BBOp::Shift<Direction::UP_LEFT>(squareBB)   |
+        BBOp::Shift<Direction::UP_RIGHT>(squareBB)  |
+        BBOp::Shift<Direction::DOWN_LEFT>(squareBB) |
+        BBOp::Shift<Direction::DOWN_RIGHT>(squareBB);
 }
 
 static Bitboard ComputeRookAttack(Square square, Bitboard occupancy) {
@@ -56,4 +70,21 @@ static Bitboard ComputeBishopAttack(Square square, Bitboard occupancy) {
         SlideAttack<Direction::UP_RIGHT>(square, occupancy) |
         SlideAttack<Direction::DOWN_LEFT>(square, occupancy)|
         SlideAttack<Direction::DOWN_RIGHT>(square, occupancy);
+}
+
+static Bitboard ComputeKightAttack(Square square) {
+    Bitboard squareBB = BBOp::SquareBB(square);
+    Bitboard ul = BBOp::Shift<Direction::UP_LEFT>(squareBB);
+    Bitboard ur = BBOp::Shift<Direction::UP_RIGHT>(squareBB);
+    Bitboard dl = BBOp::Shift<Direction::DOWN_LEFT>(squareBB);
+    Bitboard dr = BBOp::Shift<Direction::DOWN_RIGHT>(squareBB);
+    return
+        BBOp::Shift<Direction::UP>(ul)      |
+        BBOp::Shift<Direction::LEFT>(ul)    |
+        BBOp::Shift<Direction::UP>(ur)      |
+        BBOp::Shift<Direction::RIGHT>(ur)   |
+        BBOp::Shift<Direction::DOWN>(dl)    |
+        BBOp::Shift<Direction::LEFT>(dl)    |
+        BBOp::Shift<Direction::DOWN>(dr)    |
+        BBOp::Shift<Direction::RIGHT>(dr);
 }
