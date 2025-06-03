@@ -26,34 +26,34 @@ namespace {
     Bitboard attacksTable[(1 << 12) * SQUARE_NUM + (1 << 9) * SQUARE_NUM];
 }
 
-bool BBOp::initialized = false;
-Bitboard BBOp::pseudoAttacks[PIECE_TYPE_NUM][SQUARE_NUM];
-BBOp::Magic BBOp::rookAttacks[SQUARE_NUM];
-BBOp::Magic BBOp::bishopAttacks[SQUARE_NUM];
+bool BB::initialized = false;
+Bitboard BB::pseudoAttacks[PIECE_TYPE_NUM][SQUARE_NUM];
+BB::Magic BB::rookAttacks[SQUARE_NUM];
+BB::Magic BB::bishopAttacks[SQUARE_NUM];
 
 
 template <Direction dir>
 static Bitboard SlideAttack(Square square, Bitboard occupancy) {
     Bitboard bb = 0;
-    Bitboard squareBB = BBOp::SquareBB(square);
+    Bitboard squareBB = BB::SquareBB(square);
     while (true) {
-        squareBB = BBOp::Shift<dir>(squareBB);
+        squareBB = BB::Shift<dir>(squareBB);
         bb |= squareBB;
         if (!squareBB || squareBB & occupancy) return bb;
     }
 }
 
 static Bitboard ComputeKingAttack(Square square) {
-    Bitboard squareBB = BBOp::SquareBB(square);
+    Bitboard squareBB = BB::SquareBB(square);
     return
-        BBOp::Shift<Direction::UP>(squareBB)        |
-        BBOp::Shift<Direction::DOWN>(squareBB)      |
-        BBOp::Shift<Direction::LEFT>(squareBB)      |
-        BBOp::Shift<Direction::RIGHT>(squareBB)     |
-        BBOp::Shift<Direction::UP_LEFT>(squareBB)   |
-        BBOp::Shift<Direction::UP_RIGHT>(squareBB)  |
-        BBOp::Shift<Direction::DOWN_LEFT>(squareBB) |
-        BBOp::Shift<Direction::DOWN_RIGHT>(squareBB);
+        BB::Shift<Direction::UP>(squareBB)        |
+        BB::Shift<Direction::DOWN>(squareBB)      |
+        BB::Shift<Direction::LEFT>(squareBB)      |
+        BB::Shift<Direction::RIGHT>(squareBB)     |
+        BB::Shift<Direction::UP_LEFT>(squareBB)   |
+        BB::Shift<Direction::UP_RIGHT>(squareBB)  |
+        BB::Shift<Direction::DOWN_LEFT>(squareBB) |
+        BB::Shift<Direction::DOWN_RIGHT>(squareBB);
 }
 
 static Bitboard ComputeRookAttack(Square square, Bitboard occupancy) {
@@ -73,23 +73,23 @@ static Bitboard ComputeBishopAttack(Square square, Bitboard occupancy) {
 }
 
 static Bitboard ComputeKightAttack(Square square) {
-    Bitboard squareBB = BBOp::SquareBB(square);
-    Bitboard ul = BBOp::Shift<Direction::UP_LEFT>(squareBB);
-    Bitboard ur = BBOp::Shift<Direction::UP_RIGHT>(squareBB);
-    Bitboard dl = BBOp::Shift<Direction::DOWN_LEFT>(squareBB);
-    Bitboard dr = BBOp::Shift<Direction::DOWN_RIGHT>(squareBB);
+    Bitboard squareBB = BB::SquareBB(square);
+    Bitboard ul = BB::Shift<Direction::UP_LEFT>(squareBB);
+    Bitboard ur = BB::Shift<Direction::UP_RIGHT>(squareBB);
+    Bitboard dl = BB::Shift<Direction::DOWN_LEFT>(squareBB);
+    Bitboard dr = BB::Shift<Direction::DOWN_RIGHT>(squareBB);
     return
-        BBOp::Shift<Direction::UP>(ul)      |
-        BBOp::Shift<Direction::LEFT>(ul)    |
-        BBOp::Shift<Direction::UP>(ur)      |
-        BBOp::Shift<Direction::RIGHT>(ur)   |
-        BBOp::Shift<Direction::DOWN>(dl)    |
-        BBOp::Shift<Direction::LEFT>(dl)    |
-        BBOp::Shift<Direction::DOWN>(dr)    |
-        BBOp::Shift<Direction::RIGHT>(dr);
+        BB::Shift<Direction::UP>(ul)      |
+        BB::Shift<Direction::LEFT>(ul)    |
+        BB::Shift<Direction::UP>(ur)      |
+        BB::Shift<Direction::RIGHT>(ur)   |
+        BB::Shift<Direction::DOWN>(dl)    |
+        BB::Shift<Direction::LEFT>(dl)    |
+        BB::Shift<Direction::DOWN>(dr)    |
+        BB::Shift<Direction::RIGHT>(dr);
 }
 
-void BBOp::InitPseudoAttacks() {
+void BB::InitPseudoAttacks() {
     using SquareInt = std::underlying_type<Square>::type;
     for (SquareInt sqInt = 0; sqInt < SQUARE_NUM; sqInt++) {
         Square square = static_cast<Square>(sqInt);
@@ -107,7 +107,7 @@ void BBOp::InitPseudoAttacks() {
     }
 }
 
-void BBOp::Init() {
+void BB::Init() {
     InitPseudoAttacks();
     initialized = true;
 }
