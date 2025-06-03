@@ -38,6 +38,13 @@ public:
     template <Direction dir>
     static constexpr Bitboard Shift(Bitboard bb);
 
+    template <PieceType pieceType>
+    static Bitboard AttacksBB(Square square);
+    template <PieceType pieceType>
+    static Bitboard AttacksBB(Square square, Bitboard occupancy);
+    static Bitboard AttacksBB(PieceType pieceType, Square square);
+    static Bitboard AttacksBB(PieceType pieceType, Square square, Bitboard occupancy);
+
     static uint32_t Count1s(Bitboard bb);
     static Bitboard LsbBB(Bitboard bb);
     static Square Lsb(Bitboard bb);
@@ -99,8 +106,61 @@ constexpr Bitboard BB::Shift(Bitboard bb) {
     return bb;
 }
 
+template <PieceType pieceType>
+inline Bitboard BB::AttacksBB(Square square) {
+    static_assert(pieceType != PieceType::Pawn);
+    assert(initialized);
+    return pseudoAttacks[ToInt(pieceType)][ToInt(square)]; 
+}
 
-inline uint32_t BB::Count1s(Bitboard bb) {
+template <PieceType pieceType>
+inline Bitboard BB::AttacksBB(Square square, Bitboard occupancy) {
+    static_assert(pieceType != PieceType::Pawn);
+    assert(initialized);
+
+    if constexpr (pieceType == PieceType::Queen) {
+        return 
+            AttacksBB<PieceType::Rook>(square, occupancy) | 
+            AttacksBB<PieceType::Bishop>(square, occupancy);
+    }
+    else if constexpr (pieceType == PieceType::Rook) {
+        return rookAttacks[ToInt(square)].Attacks(occupancy);
+    }
+    else if constexpr (pieceType == PieceType::Bishop) {
+        return bishopAttacks[ToInt(square)].Attacks(occupancy);
+    } 
+    else {
+        return pseudoAttacks[ToInt(pieceType)][ToInt(square)];
+    }
+}
+
+inline Bitboard BB::AttacksBB(PieceType pieceType, Square square) {
+    assert(pieceType != PieceType::Pawn);
+    assert(initialized);
+    return pseudoAttacks[ToInt(pieceType)][ToInt(square)]; 
+}
+
+inline Bitboard BB::AttacksBB(PieceType pieceType, Square square, Bitboard occupancy) {
+    assert(pieceType != PieceType::Pawn);
+    assert(initialized);
+
+    switch (pieceType) {
+    case PieceType::Queen:
+        return AttacksBB<PieceType::Queen>(square, occupancy);
+    
+    case PieceType::Rook:
+        return AttacksBB<PieceType::Rook>(square, occupancy);
+
+    case PieceType::Bishop:
+        return AttacksBB<PieceType::Bishop>(square, occupancy);
+
+    default:
+        return pseudoAttacks[ToInt(pieceType)][ToInt(square)];
+    }
+}
+
+inline uint32_t BB::Count1s(Bitboard bb)
+{
     return __builtin_popcountll(bb);
 }
 
