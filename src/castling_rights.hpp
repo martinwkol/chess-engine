@@ -11,8 +11,9 @@ public:
     static constexpr uint8_t BLACK_KINGSIDE = 8;
     static constexpr uint8_t WHITE = WHITE_QUEENSIDE | WHITE_KINGSIDE;
     static constexpr uint8_t BLACK = BLACK_QUEENSIDE | BLACK_KINGSIDE;
+    static constexpr uint8_t ALL = WHITE | BLACK;
     
-    CastlingRights() { mRights = WHITE | BLACK; }
+    CastlingRights() { mRights = ALL; }
     CastlingRights(uint8_t rights) { mRights = rights; }
     operator uint8_t&() { return mRights; }
 
