@@ -11,23 +11,23 @@ using Bitboard = uint64_t;
  */
 class BB {
 public:
-    static constexpr Bitboard FILE_A = (1 << 8) - 1;
-    static constexpr Bitboard FILE_B = FILE_A << (8 * 1);
-    static constexpr Bitboard FILE_C = FILE_A << (8 * 2);
-    static constexpr Bitboard FILE_D = FILE_A << (8 * 3);
-    static constexpr Bitboard FILE_E = FILE_A << (8 * 4);
-    static constexpr Bitboard FILE_F = FILE_A << (8 * 5);
-    static constexpr Bitboard FILE_G = FILE_A << (8 * 6);
-    static constexpr Bitboard FILE_H = FILE_A << (8 * 7);
+    static constexpr Bitboard FILE_A = 0x0101010101010101ull;
+    static constexpr Bitboard FILE_B = FILE_A << 1;
+    static constexpr Bitboard FILE_C = FILE_A << 2;
+    static constexpr Bitboard FILE_D = FILE_A << 3;
+    static constexpr Bitboard FILE_E = FILE_A << 4;
+    static constexpr Bitboard FILE_F = FILE_A << 5;
+    static constexpr Bitboard FILE_G = FILE_A << 6;
+    static constexpr Bitboard FILE_H = FILE_A << 7;
     
-    static constexpr Bitboard RANK_1 = 0x0101010101010101ull;
-    static constexpr Bitboard RANK_2 = RANK_1 << 1;
-    static constexpr Bitboard RANK_3 = RANK_1 << 2;
-    static constexpr Bitboard RANK_4 = RANK_1 << 3;
-    static constexpr Bitboard RANK_5 = RANK_1 << 4;
-    static constexpr Bitboard RANK_6 = RANK_1 << 5;
-    static constexpr Bitboard RANK_7 = RANK_1 << 6;
-    static constexpr Bitboard RANK_8 = RANK_1 << 7;
+    static constexpr Bitboard RANK_1 = (1 << 8) - 1;
+    static constexpr Bitboard RANK_2 = RANK_1 << (8 * 1);
+    static constexpr Bitboard RANK_3 = RANK_1 << (8 * 2);
+    static constexpr Bitboard RANK_4 = RANK_1 << (8 * 3);
+    static constexpr Bitboard RANK_5 = RANK_1 << (8 * 4);
+    static constexpr Bitboard RANK_6 = RANK_1 << (8 * 5);
+    static constexpr Bitboard RANK_7 = RANK_1 << (8 * 6);
+    static constexpr Bitboard RANK_8 = RANK_1 << (8 * 7);
 
     static void Init();
 
@@ -84,11 +84,11 @@ private:
 };
 
 constexpr Bitboard BB::FileBB(BoardFile file) {
-    return FILE_A << (ToInt(file) * 8);
+    return FILE_A << ToInt(file);
 }
 
 constexpr Bitboard BB::RankBB(BoardRank rank) {
-    return RANK_1 << ToInt(rank);
+    return RANK_1 << (ToInt(rank) * 8);
 }
 
 constexpr Bitboard BB::SquareBB(Square square) {
@@ -104,8 +104,8 @@ constexpr Bitboard BB::Shift(Bitboard bb) {
     constexpr int shift         = (ShiftsUp ? 8 : 0) + (ShiftsDown ? -8 : 0) + (ShiftsRight ? 1 : 0) + (ShiftsLeft ? -1 : 0);
     if constexpr (shift >= 0)   bb <<= shift;
     else                        bb >>= -shift;
-    if constexpr (ShiftsRight)  bb &= ~RANK_1;
-    if constexpr (ShiftsLeft)   bb &= ~RANK_8;
+    if constexpr (ShiftsRight)  bb &= ~FILE_A;
+    if constexpr (ShiftsLeft)   bb &= ~FILE_H;
     return bb;
 }
 
