@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////////////
 
 constexpr uint8_t DIRECTION_NUM = 8;
-enum class Direction {
+enum class Direction : int8_t {
     UP,
     UP_RIGHT,
     RIGHT,
