@@ -36,7 +36,8 @@ enum class BoardFile : uint8_t {
     E = 4,
     F = 5,
     G = 6, 
-    H = 7
+    H = 7,  
+    None = 255
 };
 
 constexpr uint8_t BOARD_RANK_NUM = 8;
@@ -48,7 +49,8 @@ enum class BoardRank : uint8_t {
     R5 = 4,
     R6 = 5,
     R7 = 6,
-    R8 = 7
+    R8 = 7,  
+    None = 255
 };
 
 constexpr uint8_t SQUARE_NUM = 64;
@@ -60,7 +62,8 @@ enum class Square : uint8_t {
     E1 = 32, E2 = 33, E3 = 34, E4 = 35, E5 = 36, E6 = 37, E7 = 38, E8 = 39, 
     F1 = 40, F2 = 41, F3 = 42, F4 = 43, F5 = 44, F6 = 45, F7 = 46, F8 = 47, 
     G1 = 48, G2 = 49, G3 = 50, G4 = 51, G5 = 52, G6 = 53, G7 = 54, G8 = 55, 
-    H1 = 56, H2 = 57, H3 = 58, H4 = 59, H5 = 60, H6 = 61, H7 = 62, H8 = 63
+    H1 = 56, H2 = 57, H3 = 58, H4 = 59, H5 = 60, H6 = 61, H7 = 62, H8 = 63,  
+    None = 255
 };
 
 constexpr bool IsValid(BoardFile file) {
@@ -140,7 +143,8 @@ constexpr BoardRank RankOf(Square square) {
 constexpr uint8_t COLOR_NUM = 2;
 enum class Color : uint8_t {
     White = 0,
-    Black = 1
+    Black = 1,  
+    None = 255
 };
 
 constexpr uint8_t PIECE_TYPE_NUM = 6;
@@ -150,7 +154,8 @@ enum class PieceType : uint8_t {
     Rook = 2,
     Knight = 3,
     Bishop = 4,
-    Pawn = 5
+    Pawn = 5,  
+    None = 255
 };
 
 constexpr uint8_t PIECE_NUM = 12;
