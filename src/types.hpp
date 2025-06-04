@@ -161,6 +161,7 @@ enum class Piece : uint8_t {
     WhiteKnight = 6, BlackKnight = 7,
     WhiteBishop = 8, BlackBishop = 9,
     WhitePawn = 10,  BlackPawn = 11,  
+    None = 255
 };
 
 constexpr bool IsValid(Color color) {
