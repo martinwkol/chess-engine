@@ -28,7 +28,7 @@ enum class Direction {
 /////////////////////////////////////////////////////////
 
 constexpr uint8_t BOARD_FILE_NUM = 8;
-enum class BoardFile : uint8_t {
+enum class BoardFile : int8_t {
     A = 0,
     B = 1,
     C = 2,
@@ -37,11 +37,11 @@ enum class BoardFile : uint8_t {
     F = 5,
     G = 6, 
     H = 7,  
-    None = 255
+    None = 127
 };
 
 constexpr uint8_t BOARD_RANK_NUM = 8;
-enum class BoardRank : uint8_t {
+enum class BoardRank : int8_t {
     R1 = 0,
     R2 = 1,
     R3 = 2,
@@ -50,11 +50,11 @@ enum class BoardRank : uint8_t {
     R6 = 5,
     R7 = 6,
     R8 = 7,  
-    None = 255
+    None = 127
 };
 
 constexpr uint8_t SQUARE_NUM = 64;
-enum class Square : uint8_t {
+enum class Square : int8_t {
     A1 = 0,  A2 = 1,  A3 = 2,  A4 = 3,  A5 = 4,  A6 = 5,  A7 = 6,  A8 = 7,  
     B1 = 8,  B2 = 9,  B3 = 10, B4 = 11, B5 = 12, B6 = 13, B7 = 14, B8 = 15,
     C1 = 16, C2 = 17, C3 = 18, C4 = 19, C5 = 20, C6 = 21, C7 = 22, C8 = 23, 
@@ -63,7 +63,7 @@ enum class Square : uint8_t {
     F1 = 40, F2 = 41, F3 = 42, F4 = 43, F5 = 44, F6 = 45, F7 = 46, F8 = 47, 
     G1 = 48, G2 = 49, G3 = 50, G4 = 51, G5 = 52, G6 = 53, G7 = 54, G8 = 55, 
     H1 = 56, H2 = 57, H3 = 58, H4 = 59, H5 = 60, H6 = 61, H7 = 62, H8 = 63,  
-    None = 255
+    None = 127
 };
 
 constexpr bool IsValid(BoardFile file) {
@@ -78,58 +78,58 @@ constexpr bool IsValid(Square square) {
     return Square::A1 <= square && square <= Square::H8;
 }
 
-constexpr BoardFile ToBoardFile(uint8_t n) {
+constexpr BoardFile ToBoardFile(int8_t n) {
     BoardFile file = static_cast<BoardFile>(n);
     assert(IsValid(file));
     return file;
 }
 
-constexpr uint8_t ToInt(BoardFile file) {
+constexpr int8_t ToInt(BoardFile file) {
     assert(IsValid(file));
-    return static_cast<uint8_t>(file);
+    return static_cast<int8_t>(file);
 }
 
-constexpr BoardRank ToBoardRank(uint8_t n) {
+constexpr BoardRank ToBoardRank(int8_t n) {
     BoardRank rank = static_cast<BoardRank>(n);
     assert(IsValid(rank));
     return rank;
 }
 
-constexpr uint8_t ToInt(BoardRank rank) {
+constexpr int8_t ToInt(BoardRank rank) {
     assert(IsValid(rank));
-    return static_cast<uint8_t>(rank);
+    return static_cast<int8_t>(rank);
 }
 
-constexpr Square ToSquare(uint8_t n) {
+constexpr Square ToSquare(int8_t n) {
     Square square = static_cast<Square>(n);
     assert(IsValid(square));
     return square;
 }
 
-constexpr uint8_t ToInt(Square square) {
+constexpr int8_t ToInt(Square square) {
     assert(IsValid(square));
-    return static_cast<uint8_t>(square);
+    return static_cast<int8_t>(square);
 }
 
 constexpr Square MakeSquare(BoardFile file, BoardRank rank) {
     assert(IsValid(file));
     assert(IsValid(rank));
     return static_cast<Square>(
-        (static_cast<uint8_t>(rank) << 3) | static_cast<uint8_t>(file)
+        (static_cast<int8_t>(rank) << 3) | static_cast<int8_t>(file)
     );
 }
 
 constexpr BoardFile FileOf(Square square) {
     assert(IsValid(square));
     return static_cast<BoardFile>(
-        static_cast<uint8_t>(square) & 7
+        static_cast<int8_t>(square) & 7
     );
 }
 
 constexpr BoardRank RankOf(Square square) {
     assert(IsValid(square));
     return static_cast<BoardRank>(
-        static_cast<uint8_t>(square) >> 3
+        static_cast<int8_t>(square) >> 3
     );
 }
 
@@ -141,32 +141,32 @@ constexpr BoardRank RankOf(Square square) {
 //////////////////////////////////////////////////////////
 
 constexpr uint8_t COLOR_NUM = 2;
-enum class Color : uint8_t {
+enum class Color : int8_t {
     White = 0,
     Black = 1,  
-    None = 255
+    None = 127
 };
 
 constexpr uint8_t PIECE_TYPE_NUM = 6;
-enum class PieceType : uint8_t {
+enum class PieceType : int8_t {
     King = 0,
     Queen = 1,
     Rook = 2,
     Knight = 3,
     Bishop = 4,
     Pawn = 5,  
-    None = 255
+    None = 127
 };
 
 constexpr uint8_t PIECE_NUM = 12;
-enum class Piece : uint8_t {
+enum class Piece : int8_t {
     WhiteKing = 0,   BlackKing = 1,  
     WhiteQueen = 2,  BlackQueen = 3, 
     WhiteRook = 4,   BlackRook = 5,  
     WhiteKnight = 6, BlackKnight = 7,
     WhiteBishop = 8, BlackBishop = 9,
     WhitePawn = 10,  BlackPawn = 11,  
-    None = 255
+    None = 127
 };
 
 constexpr bool IsValid(Color color) {
@@ -181,58 +181,58 @@ constexpr bool IsValid(Piece piece) {
     return Piece::WhiteKing <= piece && piece <= Piece::BlackPawn;
 }
 
-constexpr Color ToColor(uint8_t n) {
+constexpr Color ToColor(int8_t n) {
     Color color = static_cast<Color>(n);
     assert(IsValid(color));
     return color;
 }
 
-constexpr uint8_t ToInt(Color color) {
+constexpr int8_t ToInt(Color color) {
     assert(IsValid(color));
-    return static_cast<uint8_t>(color);
+    return static_cast<int8_t>(color);
 }
 
-constexpr PieceType ToPieceType(uint8_t n) {
+constexpr PieceType ToPieceType(int8_t n) {
     PieceType pieceType = static_cast<PieceType>(n);
     assert(IsValid(pieceType));
     return pieceType;
 }
 
-constexpr uint8_t ToInt(PieceType pieceType) {
+constexpr int8_t ToInt(PieceType pieceType) {
     assert(IsValid(pieceType));
-    return static_cast<uint8_t>(pieceType);
+    return static_cast<int8_t>(pieceType);
 }
 
-constexpr Piece ToPiece(uint8_t n) {
+constexpr Piece ToPiece(int8_t n) {
     Piece piece = static_cast<Piece>(n);
     assert(IsValid(piece));
     return piece;
 }
 
-constexpr uint8_t ToInt(Piece piece) {
+constexpr int8_t ToInt(Piece piece) {
     assert(IsValid(piece));
-    return static_cast<uint8_t>(piece);
+    return static_cast<int8_t>(piece);
 }
 
 constexpr Piece MakePiece(Color color, PieceType type) {
     assert(IsValid(color));
     assert(IsValid(type));
     return static_cast<Piece>(
-        (static_cast<uint8_t>(type) << 1) | static_cast<uint8_t>(color)
+        (static_cast<int8_t>(type) << 1) | static_cast<int8_t>(color)
     );
 }
 
 constexpr Color ColorOf(Piece piece) {
     assert(IsValid(piece));
     return static_cast<Color>(
-        static_cast<uint8_t>(piece) & 1
+        static_cast<int8_t>(piece) & 1
     );
 }
 
 constexpr PieceType PieceTypeOf(Piece piece) {
     assert(IsValid(piece));
     return static_cast<PieceType>(
-        static_cast<uint8_t>(piece) >> 1
+        static_cast<int8_t>(piece) >> 1
     );
 }
 
