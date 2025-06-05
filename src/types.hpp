@@ -236,3 +236,21 @@ constexpr PieceType PieceTypeOf(Piece piece) {
     );
 }
 
+
+#define DEFINE_ADD_SUB_OPERATORS(T) \
+    constexpr T& operator++(T& t)             { t = T(ToInt(t) + 1); return t; } \
+    constexpr T& operator--(T& t)             { t = T(ToInt(t) - 1); return t; } \
+    constexpr T  operator+(T t, int8_t s)     { return T(ToInt(t) + s); } \
+    constexpr T& operator+=(T& t, int8_t s)   { t = T(ToInt(t) + s); return t; } \
+    constexpr T  operator-(T t, int8_t s)     { return T(ToInt(t) - s); } \
+    constexpr T& operator-=(T& t, int8_t s)   { t = T(ToInt(t) - s); return t; }
+
+
+DEFINE_ADD_SUB_OPERATORS(BoardFile);
+DEFINE_ADD_SUB_OPERATORS(BoardRank);
+DEFINE_ADD_SUB_OPERATORS(Square);
+DEFINE_ADD_SUB_OPERATORS(Color);
+DEFINE_ADD_SUB_OPERATORS(PieceType);
+DEFINE_ADD_SUB_OPERATORS(Piece);
+
+#undef DEFINE_ADD_SUB_OPERATORS
