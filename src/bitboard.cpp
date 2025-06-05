@@ -202,31 +202,26 @@ static Bitboard ComputeKightAttack(Square square) {
 }
 
 void BB::InitPseudoAttacks() {
-    using SquareInt = std::underlying_type<Square>::type;
-    for (SquareInt sqInt = 0; sqInt < SQUARE_NUM; sqInt++) {
-        Square square = ToSquare(sqInt);
+    for (Square square = Square::A1; square <= Square::H8; ++square) {
         Bitboard kingAttack = ComputeKingAttack(square);
         Bitboard rookAttack = ComputeRookAttack(square, 0);
         Bitboard bishopAttack = ComputeBishopAttack(square, 0);
         Bitboard knightAttack = ComputeKightAttack(square);
 
-        pseudoAttacks[ToInt(PieceType::King)][sqInt]    = kingAttack;
-        pseudoAttacks[ToInt(PieceType::Queen)][sqInt]   = rookAttack | bishopAttack;
-        pseudoAttacks[ToInt(PieceType::Rook)][sqInt]    = rookAttack;
-        pseudoAttacks[ToInt(PieceType::Bishop)][sqInt]  = bishopAttack;
-        pseudoAttacks[ToInt(PieceType::Knight)][sqInt]  = knightAttack;
+        pseudoAttacks[ToInt(PieceType::King)][ToInt(square)]    = kingAttack;
+        pseudoAttacks[ToInt(PieceType::Queen)][ToInt(square)]   = rookAttack | bishopAttack;
+        pseudoAttacks[ToInt(PieceType::Rook)][ToInt(square)]    = rookAttack;
+        pseudoAttacks[ToInt(PieceType::Bishop)][ToInt(square)]  = bishopAttack;
+        pseudoAttacks[ToInt(PieceType::Knight)][ToInt(square)]  = knightAttack;
     }
 }
 
 void BB::InitMagicBitboards() {
     Bitboard* table = attacksTable;
-    using SquareInt = std::underlying_type<Square>::type;
-    for (SquareInt sqInt = 0; sqInt < SQUARE_NUM; sqInt++) {
-        Square square = ToSquare(sqInt);
+    for (Square square = Square::A1; square <= Square::H8; ++square) {
         table = InitMagicBitboards(PieceType::Rook, square, table);
     }
-    for (SquareInt sqInt = 0; sqInt < SQUARE_NUM; sqInt++) {
-        Square square = ToSquare(sqInt);
+    for (Square square = Square::A1; square <= Square::H8; ++square) {
         table = InitMagicBitboards(PieceType::Bishop, square, table);
     }
 }
