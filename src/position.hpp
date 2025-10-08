@@ -12,6 +12,11 @@ public:
     explicit Position(const char* fen) { InitFromFEN(fen); }
     explicit Position(const std::string& fen) { InitFromFEN(fen.c_str()); }
     
+    std::string GetFEN() const;
+
+    Bitboard GetPiecesBB(Piece piece) const { return mPiecesBB[ToInt(ColorOf(piece))][ToInt(PieceTypeOf(piece))]; }
+    Piece GetBoard(Square square) const { return mBoard[ToInt(square)]; }
+    
 
 private:
     Bitboard mPiecesBB[COLOR_NUM][PIECE_TYPE_NUM]   = { (Bitboard)0 };
@@ -31,4 +36,7 @@ private:
     const char* InitFromFEN_ExpectSpace(const char* fen);
     
     void AddPiece(Piece piece, Square square);
+
+    Bitboard& PiecesBB(Piece piece) { return mPiecesBB[ToInt(ColorOf(piece))][ToInt(PieceTypeOf(piece))]; }
+    Piece& Board(Square square) { return mBoard[ToInt(square)]; }
 };

@@ -43,16 +43,19 @@ public:
         mRights &= color == Color::White ? ~WHITE_KINGSIDE : ~BLACK_KINGSIDE; 
     }
 
-    template <Color color> bool CanCastleQueenside() { 
+    template <Color color> bool CanCastleQueenside() const { 
         static_assert(IsValid(color));
         return (mRights & (color == Color::White ? WHITE_QUEENSIDE : BLACK_QUEENSIDE)); 
     }
 
-    template <Color color> bool CanCastleKingside() { 
+    template <Color color> bool CanCastleKingside() const { 
         static_assert(IsValid(color));
         return (mRights & (color == Color::White ? WHITE_KINGSIDE : BLACK_KINGSIDE)); 
     }
 
+    bool AnyCastlingAllowed() const {
+        return mRights != NONE;
+    }
 
 private:
     uint8_t mRights;

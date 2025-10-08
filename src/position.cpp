@@ -1,9 +1,58 @@
 #include "position.hpp"
+
 #include <stdexcept>
 #include <cctype>
 #include <string>
+#include <sstream>
 
-void Position::InitFromFEN(const char* fen) {
+std::string Position::GetFEN() const {
+    std::stringstream s;
+    for (BoardRank rank = BoardRank::R8; rank >= BoardRank::R1; --rank) {
+        int emptyCounter = 0;
+        for (BoardFile file = BoardFile::A; file <= BoardFile::H; ++file) {
+            Piece piece = GetBoard(MakeSquare(file, rank));
+            if (piece != Piece::None) {
+                char pieceChar;
+                switch (PieceTypeOf(piece)) {
+                case PieceType::King :      pieceChar = 'K'; break;
+                case PieceType::Queen :     pieceChar = 'Q'; break;
+                case PieceType::Rook :      pieceChar = 'R'; break;
+                case PieceType::Knight :    pieceChar = 'N'; break;
+                case PieceType::Bishop :    pieceChar = 'B'; break;
+                case PieceType::Pawn :      pieceChar = 'P'; break;
+                default:                    pieceChar = 'E'; break;
+                }
+                if (ColorOf(piece) == Color::Black) pieceChar = std::tolower(pieceChar);
+                if (emptyCounter > 0) s << emptyCounter;
+                emptyCounter = 0;
+                s << pieceChar;
+            } 
+            else {
+                ++emptyCounter;
+            }
+        }
+        if (emptyCounter > 0) s << emptyCounter;
+        if (rank != BoardRank::R1) s << '/';
+    }
+
+    s << ' ' << (mSideToMove == Color::White ? 'w' : 'b') << ' ';
+
+    if (mCastlingRights.AnyCastlingAllowed()) {
+        s   << (mCastlingRights.CanCastleKingside<Color::White>() ? "K" : "")
+            << (mCastlingRights.CanCastleQueenside<Color::White>() ? "Q" : "")
+            << (mCastlingRights.CanCastleKingside<Color::Black>() ? "k" : "")
+            << (mCastlingRights.CanCastleQueenside<Color::Black>() ? "q" : "");
+    } 
+    else {
+        s << '-';
+    }
+
+    s << ' ' << mReversableHalfMovesCnt << ' ' << mMoveNum;
+
+    return s.str();
+}
+
+void Position::InitFromFEN(const char *fen) {
     fen = InitFromFEN_PiecePosition(fen);
     fen = InitFromFEN_ExpectSpace(fen);
     fen = InitFromFEN_SideToMove(fen);
@@ -101,6 +150,6 @@ const char* Position::InitFromFEN_ExpectSpace(const char* fen) {
 
 void Position::AddPiece(Piece piece, Square square) {
     assert(mBoard[ToInt(square)] == Piece::None);
-    mBoard[ToInt(square)] = piece;
-    mPiecesBB[ToInt(ColorOf(piece))][ToInt(PieceTypeOf(piece))] |= BB::SquareBB(square);
+    Board(square) = piece;
+    PiecesBB(piece) |= BB::SquareBB(square);
 }
