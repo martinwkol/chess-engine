@@ -33,7 +33,7 @@ public:
         mRights &= color == Color::White ? ~WHITE_QUEENSIDE : ~BLACK_QUEENSIDE; 
     }
 
-    template <Color color> void ForbidCastlingKingside() { 
+    template <Color color> void AllowCastlingKingside() { 
         static_assert(IsValid(color));
         mRights |= color == Color::White ? WHITE_KINGSIDE : BLACK_KINGSIDE; 
     }
