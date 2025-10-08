@@ -30,6 +30,5 @@ private:
     const char* InitFromFEN_MoveNum(const char* fen);
     const char* InitFromFEN_ExpectSpace(const char* fen);
     
-
     void AddPiece(Piece piece, Square square);
 };

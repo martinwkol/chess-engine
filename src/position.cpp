@@ -98,3 +98,9 @@ const char* Position::InitFromFEN_ExpectSpace(const char* fen) {
     if (*fen != ' ') throw std::invalid_argument("Illegal fen: fen ends before castling rights color");
     return fen + 1;
 }
+
+void Position::AddPiece(Piece piece, Square square) {
+    assert(mBoard[ToInt(square)] == Piece::None);
+    mBoard[ToInt(square)] = piece;
+    mPiecesBB[ToInt(ColorOf(piece))][ToInt(PieceTypeOf(piece))] |= BB::SquareBB(square);
+}
