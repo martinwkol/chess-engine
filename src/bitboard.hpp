@@ -39,14 +39,14 @@ public:
     static constexpr Bitboard Shift(Bitboard bb);
 
     template <PieceType pieceType>
-    static Bitboard AttacksBB(Square square);
+    static Bitboard Attacks(Square square);
     template <PieceType pieceType>
-    static Bitboard AttacksBB(Square square, Bitboard occupancy);
-    static Bitboard AttacksBB(PieceType pieceType, Square square);
-    static Bitboard AttacksBB(PieceType pieceType, Square square, Bitboard occupancy);
+    static Bitboard Attacks(Square square, Bitboard occupancy);
+    static Bitboard Attacks(PieceType pieceType, Square square);
+    static Bitboard Attacks(PieceType pieceType, Square square, Bitboard occupancy);
     template <Color color>
-    static constexpr Bitboard PawnAttacksBB(Square square);
-    static constexpr Bitboard PawnAttacksBB(Color color, Square square);
+    static constexpr Bitboard PawnAttacks(Square square);
+    static constexpr Bitboard PawnAttacks(Color color, Square square);
 
     static uint32_t Count1s(Bitboard bb);
     static Bitboard LsbBB(Bitboard bb);
@@ -110,21 +110,21 @@ constexpr Bitboard BB::Shift(Bitboard bb) {
 }
 
 template <PieceType pieceType>
-inline Bitboard BB::AttacksBB(Square square) {
+inline Bitboard BB::Attacks(Square square) {
     static_assert(pieceType != PieceType::Pawn);
     assert(initialized);
     return pseudoAttacks[ToInt(pieceType)][ToInt(square)]; 
 }
 
 template <PieceType pieceType>
-inline Bitboard BB::AttacksBB(Square square, Bitboard occupancy) {
+inline Bitboard BB::Attacks(Square square, Bitboard occupancy) {
     static_assert(pieceType != PieceType::Pawn);
     assert(initialized);
 
     if constexpr (pieceType == PieceType::Queen) {
         return 
-            AttacksBB<PieceType::Rook>(square, occupancy) | 
-            AttacksBB<PieceType::Bishop>(square, occupancy);
+            Attacks<PieceType::Rook>(square, occupancy) | 
+            Attacks<PieceType::Bishop>(square, occupancy);
     }
     else if constexpr (pieceType == PieceType::Rook) {
         return rookAttacks[ToInt(square)].Attacks(occupancy);
@@ -138,7 +138,7 @@ inline Bitboard BB::AttacksBB(Square square, Bitboard occupancy) {
 }
 
 template <Color color>
-constexpr Bitboard BB::PawnAttacksBB(Square square) {
+constexpr Bitboard BB::PawnAttacks(Square square) {
     constexpr Bitboard squareBB = SquareBB(square);
     if constexpr (color == Color::White) {
         return Shift<Direction::UP_LEFT>(squareBB) | Shift<Direction::UP_RIGHT>(squareBB);
@@ -147,32 +147,32 @@ constexpr Bitboard BB::PawnAttacksBB(Square square) {
     }
 }
 
-inline Bitboard BB::AttacksBB(PieceType pieceType, Square square) {
+inline Bitboard BB::Attacks(PieceType pieceType, Square square) {
     assert(pieceType != PieceType::Pawn);
     assert(initialized);
     return pseudoAttacks[ToInt(pieceType)][ToInt(square)]; 
 }
 
-inline Bitboard BB::AttacksBB(PieceType pieceType, Square square, Bitboard occupancy) {
+inline Bitboard BB::Attacks(PieceType pieceType, Square square, Bitboard occupancy) {
     assert(pieceType != PieceType::Pawn);
     assert(initialized);
 
     switch (pieceType) {
     case PieceType::Queen:
-        return AttacksBB<PieceType::Queen>(square, occupancy);
+        return Attacks<PieceType::Queen>(square, occupancy);
     
     case PieceType::Rook:
-        return AttacksBB<PieceType::Rook>(square, occupancy);
+        return Attacks<PieceType::Rook>(square, occupancy);
 
     case PieceType::Bishop:
-        return AttacksBB<PieceType::Bishop>(square, occupancy);
+        return Attacks<PieceType::Bishop>(square, occupancy);
 
     default:
         return pseudoAttacks[ToInt(pieceType)][ToInt(square)];
     }
 }
 
-inline constexpr Bitboard BB::PawnAttacksBB(Color color, Square square) {
+inline constexpr Bitboard BB::PawnAttacks(Color color, Square square) {
     const Bitboard squareBB = SquareBB(square);
     if (color == Color::White) {
         return Shift<Direction::UP_LEFT>(squareBB) | Shift<Direction::UP_RIGHT>(squareBB);
@@ -181,9 +181,17 @@ inline constexpr Bitboard BB::PawnAttacksBB(Color color, Square square) {
     }
 }
 
-inline uint32_t BB::Count1s(Bitboard bb)
-{
+inline uint32_t BB::Count1s(Bitboard bb) {
+    // TODO: support more compilers
+#if defined(__GNUC__)
+
     return __builtin_popcountll(bb);
+
+#else
+    
+    #error "Compiler not supported"
+
+#endif
 }
 
 inline Square BB::Lsb(Bitboard bb) {
@@ -221,8 +229,7 @@ inline Square BB::Lsb(Bitboard bb) {
 #endif 
 }
 
-inline Bitboard BB::LsbBB(Bitboard bb)
-{
+inline Bitboard BB::LsbBB(Bitboard bb) {
     assert(bb);
     return bb & -bb;
 }
