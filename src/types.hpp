@@ -23,6 +23,14 @@ constexpr int8_t ToInt(Direction direction) {
     return static_cast<int8_t>(direction);
 }
 
+constexpr Direction ToDirection(int8_t n) {
+    return Direction(n);
+}
+
+constexpr Direction operator-(Direction direction) {
+    return ToDirection(-ToInt(direction));
+}
+
 
 
 
@@ -137,10 +145,25 @@ constexpr BoardRank RankOf(Square square) {
     );
 }
 
-constexpr Square Move(Square square, Direction direction) {
-    Square sq = ToSquare(ToInt(square) + ToInt(direction));
-    return sq;
+constexpr Square operator+(Square square, Direction direction) {
+    return ToSquare(ToInt(square) + ToInt(direction));
 }
+
+constexpr Square& operator+=(Square& square, Direction direction) {
+    square = square + direction;
+    return square;
+}
+
+constexpr Square operator-(Square square, Direction direction) {
+    return ToSquare(ToInt(square) - ToInt(direction));
+}
+
+constexpr Square& operator-=(Square& square, Direction direction) {
+    square = square - direction;
+    return square;
+}
+
+
 
 
 
