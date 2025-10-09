@@ -1,5 +1,7 @@
 #include "bitboard.hpp"
 
+#include <initializer_list>
+
 namespace {
     Bitboard attacksTable[(1 << 12) * SQUARE_NUM + (1 << 9) * SQUARE_NUM];
 }
@@ -143,6 +145,9 @@ BB::Magic BB::bishopAttacks[SQUARE_NUM] = {
     { nullptr, 0x0040201008040200ULL, 0x002004012a040132ULL, 58 }
 };
 
+Bitboard BB::between[SQUARE_NUM][SQUARE_NUM] = { BB::NONE };
+Bitboard BB::line[SQUARE_NUM][SQUARE_NUM] = { BB::NONE };
+
 
 template <Direction dir>
 static Bitboard SlideAttack(Square square, Bitboard occupancy) {
@@ -152,6 +157,20 @@ static Bitboard SlideAttack(Square square, Bitboard occupancy) {
         squareBB = BB::Shift<dir>(squareBB);
         bb |= squareBB;
         if (!squareBB || squareBB & occupancy) return bb;
+    }
+}
+
+static Bitboard SlideAttack(Square square, Direction dir, Bitboard occupancy) {
+    switch (dir) {
+    case Direction::UP:         return SlideAttack<Direction::UP>(square, occupancy);
+    case Direction::UP_RIGHT:   return SlideAttack<Direction::UP_RIGHT>(square, occupancy);
+    case Direction::RIGHT:      return SlideAttack<Direction::RIGHT>(square, occupancy);
+    case Direction::DOWN_RIGHT: return SlideAttack<Direction::DOWN_RIGHT>(square, occupancy);
+    case Direction::DOWN:       return SlideAttack<Direction::DOWN>(square, occupancy);
+    case Direction::DOWN_LEFT:  return SlideAttack<Direction::DOWN_LEFT>(square, occupancy);
+    case Direction::LEFT:       return SlideAttack<Direction::LEFT>(square, occupancy);
+    case Direction::UP_LEFT:    return SlideAttack<Direction::UP_LEFT>(square, occupancy);
+    default:                    return 0;
     }
 }
 
@@ -242,8 +261,41 @@ Bitboard* BB::InitMagicBitboards(PieceType pieceType, Square square, Bitboard* t
     return tableStart + (1 << (64 - attacks.shift));
 }
 
+void BB::InitBetween() {
+    for (Square sq1 = Square::A1; sq1 <= Square::H8; ++sq1) {
+        for (Direction dir : { 
+            Direction::UP, Direction::UP_RIGHT, Direction::RIGHT, 
+            Direction::DOWN_RIGHT, Direction::DOWN, Direction::DOWN_LEFT, 
+            Direction::LEFT, Direction::UP_LEFT 
+        }) {
+            Bitboard bb = SquareBB(sq1 + dir);
+            for (Square sq2 = sq1 + dir + dir; IsValid(sq2); sq2 += dir) {
+                between[ToInt(sq1)][ToInt(sq2)] = bb;
+                bb |= SquareBB(sq2);
+            }
+        }
+    }
+}
+
+void BB::InitLine() {
+    for (Square sq1 = Square::A1; sq1 <= Square::H8; ++sq1) {
+        for (Direction dir : { 
+            Direction::UP, Direction::UP_RIGHT, Direction::RIGHT, 
+            Direction::DOWN_RIGHT, Direction::DOWN, Direction::DOWN_LEFT, 
+            Direction::LEFT, Direction::UP_LEFT 
+        }) {
+            Bitboard bb = SlideAttack(sq1, dir, 0) | SlideAttack(sq1, -dir, 0) | SquareBB(sq1);
+            for (Square sq2 = sq1 + dir; IsValid(sq2); sq2 += dir) {
+                between[ToInt(sq1)][ToInt(sq2)] = bb;
+            }
+        }
+    }
+}
+
 void BB::Init() {
     InitPseudoAttacks();
     InitMagicBitboards();
+    InitBetween();
+    InitLine();
     initialized = true;
 }

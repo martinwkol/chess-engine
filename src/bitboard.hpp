@@ -11,6 +11,9 @@ using Bitboard = uint64_t;
  */
 class BB {
 public:
+    static constexpr Bitboard NONE = 0ull;
+    static constexpr Bitboard ALL = ~NONE;
+
     static constexpr Bitboard FILE_A = 0x0101010101010101ull;
     static constexpr Bitboard FILE_B = FILE_A << 1;
     static constexpr Bitboard FILE_C = FILE_A << 2;
@@ -48,6 +51,9 @@ public:
     static constexpr Bitboard PawnAttacks(Square square);
     static constexpr Bitboard PawnAttacks(Color color, Square square);
 
+    static Bitboard Between(Square sq1, Square sq2);
+    static Bitboard Line(Square sq1, Square sq2);
+
     static uint32_t Count1s(Bitboard bb);
     static bool AtLeast2(Bitboard bb);
     static Bitboard LsbBB(Bitboard bb);
@@ -77,11 +83,15 @@ private:
     static Bitboard pseudoAttacks[PIECE_TYPE_NUM][SQUARE_NUM];
     static Magic rookAttacks[SQUARE_NUM];
     static Magic bishopAttacks[SQUARE_NUM];
+    static Bitboard between[SQUARE_NUM][SQUARE_NUM];
+    static Bitboard line[SQUARE_NUM][SQUARE_NUM];
 
     static void InitPseudoAttacks();
     static void InitMagicBitboards();
     static Bitboard* InitMagicBitboards(PieceType pieceType, Square square, Bitboard* tableStart);
-
+    static void InitBetween();
+    static void InitLine();
+    
 };
 
 constexpr Bitboard BB::FileBB(BoardFile file) {
@@ -180,6 +190,16 @@ inline constexpr Bitboard BB::PawnAttacks(Color color, Square square) {
     } else {
         return Shift<Direction::DOWN_LEFT>(squareBB) | Shift<Direction::DOWN_RIGHT>(squareBB);
     }
+}
+
+inline Bitboard BB::Between(Square sq1, Square sq2) {
+    assert(initialized);
+    return between[ToInt(sq1)][ToInt(sq2)];
+}
+
+inline Bitboard BB::Line(Square sq1, Square sq2) {
+    assert(initialized);
+    return line[ToInt(sq1)][ToInt(sq2)];
 }
 
 inline uint32_t BB::Count1s(Bitboard bb) {
