@@ -69,11 +69,11 @@ private:
         uint64_t mult;
         uint8_t shift;
 
-        uint64_t TableIndex(Bitboard occupancy) {
+        uint64_t TableIndex(Bitboard occupancy) const {
             return ((occupancy & mask) * mult) >> shift;
         }
 
-        Bitboard Attacks(Bitboard occupancy) {
+        Bitboard Attacks(Bitboard occupancy) const {
             return table[TableIndex(occupancy)];
         }
     };
