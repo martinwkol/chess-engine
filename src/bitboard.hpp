@@ -108,10 +108,10 @@ constexpr Bitboard BB::SquareBB(Square square) {
 
 template <Direction dir>
 constexpr Bitboard BB::Shift(Bitboard bb) {
-    constexpr bool ShiftsUp     = dir == Direction::UP || dir == Direction::UP_LEFT || dir == Direction::UP_RIGHT;
-    constexpr bool ShiftsDown   = dir == Direction::DOWN || dir == Direction::DOWN_LEFT || dir == Direction::DOWN_RIGHT;
-    constexpr bool ShiftsRight  = dir == Direction::RIGHT || dir == Direction::UP_RIGHT || dir == Direction::DOWN_RIGHT;
-    constexpr bool ShiftsLeft   = dir == Direction::LEFT || dir == Direction::UP_LEFT || dir == Direction::DOWN_LEFT;
+    constexpr bool ShiftsUp     = dir == Direction::UP      || dir == Direction::UP_LEFT    || dir == Direction::UP_RIGHT;
+    constexpr bool ShiftsDown   = dir == Direction::DOWN    || dir == Direction::DOWN_LEFT  || dir == Direction::DOWN_RIGHT;
+    constexpr bool ShiftsRight  = dir == Direction::RIGHT   || dir == Direction::UP_RIGHT   || dir == Direction::DOWN_RIGHT;
+    constexpr bool ShiftsLeft   = dir == Direction::LEFT    || dir == Direction::UP_LEFT    || dir == Direction::DOWN_LEFT;
     constexpr int shift         = (ShiftsUp ? 8 : 0) + (ShiftsDown ? -8 : 0) + (ShiftsRight ? 1 : 0) + (ShiftsLeft ? -1 : 0);
     if constexpr (shift >= 0)   bb <<= shift;
     else                        bb >>= -shift;
