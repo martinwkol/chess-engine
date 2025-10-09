@@ -10,6 +10,7 @@ set(SOURCES
     "${SRC_DIR}/main.cpp"
     "${SRC_DIR}/bitboard.cpp"
     "${SRC_DIR}/position.cpp"
+    "${SRC_DIR}/move_generation.cpp"
 )
 
 # Define the executable
