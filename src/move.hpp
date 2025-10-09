@@ -42,6 +42,8 @@ public:
         );
     }
 
+    Move() = default;
+
     Square GetFrom() const { return ToSquare((mMove >> FROM_SHIFT) & FROM_MASK); }
     Square GetTo() const { return ToSquare((mMove >> TO_SHIFT) & TO_MASK); }
 
