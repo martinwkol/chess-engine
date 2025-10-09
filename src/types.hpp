@@ -181,23 +181,23 @@ enum class Color : int8_t {
 
 constexpr uint8_t PIECE_TYPE_NUM = 6;
 enum class PieceType : int8_t {
-    King = 0,
-    Queen = 1,
+    Knight = 0,
+    Bishop = 1,
     Rook = 2,
-    Knight = 3,
-    Bishop = 4,
+    Queen = 3,
+    King = 4,
     Pawn = 5,  
     None = 127
 };
 
 constexpr uint8_t PIECE_NUM = 12;
 enum class Piece : int8_t {
-    WhiteKing = 0,   BlackKing = 1,  
-    WhiteQueen = 2,  BlackQueen = 3, 
-    WhiteRook = 4,   BlackRook = 5,  
-    WhiteKnight = 6, BlackKnight = 7,
-    WhiteBishop = 8, BlackBishop = 9,
-    WhitePawn = 10,  BlackPawn = 11,  
+    WhiteKnight = 0,    BlackKnight = 1,  
+    WhiteBishop = 2,    BlackBishop = 3, 
+    WhiteRook = 4,      BlackRook = 5,  
+    WhiteQueen = 6,     BlackQueen = 7,
+    WhiteKing = 8,      BlackKing = 9,
+    WhitePawn = 10,     BlackPawn = 11,  
     None = 127
 };
 
@@ -206,11 +206,11 @@ constexpr bool IsValid(Color color) {
 }
 
 constexpr bool IsValid(PieceType type) {
-    return PieceType::King <= type && type <= PieceType::Pawn;
+    return PieceType::Knight <= type && type <= PieceType::Pawn;
 }
 
 constexpr bool IsValid(Piece piece) {
-    return Piece::WhiteKing <= piece && piece <= Piece::BlackPawn;
+    return Piece::WhiteKnight <= piece && piece <= Piece::BlackPawn;
 }
 
 constexpr Color ToColor(int8_t n) {
