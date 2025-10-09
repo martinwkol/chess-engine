@@ -9,15 +9,19 @@
 
 constexpr uint8_t DIRECTION_NUM = 8;
 enum class Direction : int8_t {
-    UP,
-    UP_RIGHT,
-    RIGHT,
-    DOWN_RIGHT,
-    DOWN,
-    DOWN_LEFT,
-    LEFT,
-    UP_LEFT
+    UP = 8,
+    UP_RIGHT = 9,
+    RIGHT = 1,
+    DOWN_RIGHT = -7,
+    DOWN = -8,
+    DOWN_LEFT = -9,
+    LEFT = -1,
+    UP_LEFT = 7
 };
+
+constexpr int8_t ToInt(Direction direction) {
+    return static_cast<int8_t>(direction);
+}
 
 
 
@@ -131,6 +135,13 @@ constexpr BoardRank RankOf(Square square) {
     return static_cast<BoardRank>(
         static_cast<int8_t>(square) >> 3
     );
+}
+
+constexpr Square Move(Square square, Direction direction) {
+    assert(IsValid(square));
+    Square sq = ToSquare(ToInt(square) + ToInt(direction));
+    assert(IsValid(sq));
+    return sq;
 }
 
 
