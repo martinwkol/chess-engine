@@ -49,6 +49,7 @@ public:
     static constexpr Bitboard PawnAttacks(Color color, Square square);
 
     static uint32_t Count1s(Bitboard bb);
+    static bool AtLeast2(Bitboard bb);
     static Bitboard LsbBB(Bitboard bb);
     static Square Lsb(Bitboard bb);
     static Square PopLsb(Bitboard& bb);
@@ -192,6 +193,10 @@ inline uint32_t BB::Count1s(Bitboard bb) {
     #error "Compiler not supported"
 
 #endif
+}
+
+inline bool BB::AtLeast2(Bitboard bb) {
+    return (bb & (bb - 1)) != 0;
 }
 
 inline Square BB::Lsb(Bitboard bb) {
