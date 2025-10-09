@@ -138,9 +138,7 @@ constexpr BoardRank RankOf(Square square) {
 }
 
 constexpr Square Move(Square square, Direction direction) {
-    assert(IsValid(square));
     Square sq = ToSquare(ToInt(square) + ToInt(direction));
-    assert(IsValid(sq));
     return sq;
 }
 
