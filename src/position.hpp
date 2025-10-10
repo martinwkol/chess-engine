@@ -74,9 +74,7 @@ private:
 
     template <Color color>
     void UpdateAttacks();
-    void UpdateAttacks();
     template <Color color>
-    void UpdatePins();
     void UpdatePins();
     void UpdateKingAttacks();
     void UpdateAuxiliaryInfo();

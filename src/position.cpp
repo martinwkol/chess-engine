@@ -349,12 +349,6 @@ void Position::UpdateAttacks()
     Attacks(color) = attacks;
 }
 
-void Position::UpdateAttacks() {
-    UpdateAttacks<Color::White>();
-    UpdateAttacks<Color::Black>();
-}
-
-
 template <Color color>
 void Position::UpdatePins() {
     constexpr Color other = color == Color::White ? Color::Black : Color::White;
@@ -383,11 +377,6 @@ void Position::UpdatePins() {
     Pinned(color) = pinnedBB;
 }
 
-void Position::UpdatePins() {
-    UpdatePins<Color::White>();
-    UpdatePins<Color::Black>();
-}
-
 void Position::UpdateKingAttacks() {
     mKingAttackers = BB::NONE;
 
@@ -411,7 +400,9 @@ void Position::UpdateKingAttacks() {
 }
 
 void Position::UpdateAuxiliaryInfo() {
-    UpdateAttacks();
-    UpdatePins();
+    UpdateAttacks<Color::White>();
+    UpdateAttacks<Color::Black>();
+    UpdatePins<Color::White>();
+    UpdatePins<Color::Black>();
     UpdateKingAttacks();
 }
