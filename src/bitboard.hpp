@@ -53,6 +53,7 @@ public:
 
     static Bitboard Between(Square sq1, Square sq2);
     static Bitboard Line(Square sq1, Square sq2);
+    static bool OnLine(Square sq1, Square sq2, Square sq3);
 
     static uint32_t Count1s(Bitboard bb);
     static bool AtLeast2(Bitboard bb);
@@ -200,6 +201,10 @@ inline Bitboard BB::Between(Square sq1, Square sq2) {
 inline Bitboard BB::Line(Square sq1, Square sq2) {
     assert(initialized);
     return line[ToInt(sq1)][ToInt(sq2)];
+}
+
+inline bool BB::OnLine(Square sq1, Square sq2, Square sq3) {
+    return (Line(sq1, sq2) & SquareBB(sq3)) != 0;
 }
 
 inline uint32_t BB::Count1s(Bitboard bb) {
