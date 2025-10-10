@@ -55,6 +55,7 @@ public:
     PieceType GetPromotionType() const  { assert(IsPromotion()); return ToPieceType((mMove >> PROMOTION_TYPE_SHIFT) & PROMOTION_TYPE_MASK); }
     
     bool IsCapture() const              { return (mMove & CAPTURE_FLAG) != 0; }
+    bool IsNormalCapture() const        { return (mMove & FLAGS_MASK) == NORMAL_CAPTURE_FLAGS; }
     bool IsEnPassant() const            { return (mMove & FLAGS_MASK) == EN_PASSANT_FLAGS; }
     
     bool IsCastle() const               { return (mMove & FLAGS_EXCEPT_FIRST) == CASTLE_FLAG; }
@@ -82,6 +83,7 @@ private:
     static constexpr uint16_t QUEENSIDE_CASTLE_FLAGS= CASTLE_FLAG | (1 << 12);
 
     static constexpr uint16_t CAPTURE_FLAG          = 1 << 14;
+    static constexpr uint16_t NORMAL_CAPTURE_FLAGS  = CAPTURE_FLAG;
     static constexpr uint16_t EN_PASSANT_FLAGS      = CAPTURE_FLAG | (1 << 12);
     
     static constexpr uint16_t PROMOTION_FLAG        = 1 << 15;
