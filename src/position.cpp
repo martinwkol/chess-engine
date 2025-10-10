@@ -224,7 +224,7 @@ void Position::UpdateAttacks() {
 
 
 template <Color color>
-void Position::UpdatePinned() {
+void Position::UpdatePins() {
     constexpr Color other = color == Color::White ? Color::Black : Color::White;
     Bitboard queensBB = GetPiecesBB(other, PieceType::Queen);
     Bitboard rooksBB = GetPiecesBB(other, PieceType::Rook);
@@ -251,7 +251,35 @@ void Position::UpdatePinned() {
     Pinned(color) = pinnedBB;
 }
 
-void Position::UpdatePinned() {
-    UpdatePinned<Color::White>();
-    UpdatePinned<Color::Black>();
+void Position::UpdatePins() {
+    UpdatePins<Color::White>();
+    UpdatePins<Color::Black>();
+}
+
+void Position::UpdateKingAttacks() {
+    mKingAttackers = BB::NONE;
+
+    Color thisSide      = GetSideToMove();
+    Color opposingSide  = ~thisSide;
+
+    if (!(GetAttacks(opposingSide) & GetPiecesBB(thisSide, PieceType::King))) return;
+    
+    Bitboard opposingQueens     = GetPiecesBB(opposingSide, PieceType::Queen);
+    Bitboard opposingRooks      = GetPiecesBB(opposingSide, PieceType::Rook);
+    Bitboard opposingBishops    = GetPiecesBB(opposingSide, PieceType::Bishop);
+    Bitboard straightAttackers  = opposingQueens | opposingRooks;
+    Bitboard diagonalAttackers  = opposingQueens | opposingBishops;
+
+    Square kingSq       = GetKingPosition(thisSide);
+    Bitboard occupancy  = GetOccupancy();
+    mKingAttackers |= BB::Attacks<PieceType::Rook>(kingSq, occupancy) & straightAttackers;
+    mKingAttackers |= BB::Attacks<PieceType::Bishop>(kingSq, occupancy) & diagonalAttackers;
+    mKingAttackers |= BB::Attacks<PieceType::Knight>(kingSq) & GetPiecesBB(opposingSide, PieceType::Knight);
+    mKingAttackers |= BB::PawnAttacks(thisSide, kingSq) & GetPiecesBB(opposingSide, PieceType::Pawn);
+}
+
+void Position::UpdateAuxiliaryInfo() {
+    UpdateAttacks();
+    UpdatePins();
+    UpdateKingAttacks();
 }
