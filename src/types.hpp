@@ -31,6 +31,10 @@ constexpr Direction operator-(Direction direction) {
     return ToDirection(-ToInt(direction));
 }
 
+constexpr Direction operator+(Direction dir1, Direction dir2) {
+    return ToDirection(ToInt(dir1) + ToInt(dir2));
+}
+
 
 
 
