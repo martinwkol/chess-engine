@@ -4,7 +4,7 @@ template <Color This>
 static Move* GenerateNormalKingMoves(Move* list, const Position& pos, Bitboard allowedTargets) {
     constexpr Color Other = This == Color::White ? Color::Black : Color::White;
 
-    Square from = BB::Lsb(pos.GetPiecesBB(MakePiece(This, PieceType::King)));
+    Square from = pos.GetKingPosition(This);
     Bitboard movesBB = BB::Attacks<PieceType::King>(from);
     Bitboard attacked = pos.GetAttacks(Other);
     movesBB &= ~attacked; // King may not move into check
@@ -55,7 +55,7 @@ static Move* GenerateCastlingMoves(Move* list, const Position& pos) {
 template <Color This, PieceType PType>
 static Move* GenerateBigPieceMoves(Move* list, const Position& pos, Bitboard allowedTargets) {
     static_assert(PType != PieceType::King && PType != PieceType::Pawn);
-    
+
     Bitboard piecesBB = pos.GetPiecesBB(MakePiece(This, PType));
     while (piecesBB) {
         Square from = BB::PopLsb(piecesBB);
@@ -198,7 +198,7 @@ static Move* GenerateMoves(Move* list, const Position& pos) {
 
     if (kingAttackers) {
         // King in check -> block or capture attacker
-        Square kingSquare = BB::Lsb(pos.GetPiecesBB(MakePiece(This, PieceType::King)));
+        Square kingSquare = pos.GetKingPosition(This);
         Square attackerSquare = BB::Lsb(kingAttackers);
         allowedTargets &= BB::Between(kingSquare, attackerSquare) | kingAttackers;
     } else {
