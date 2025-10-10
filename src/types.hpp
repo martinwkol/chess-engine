@@ -272,6 +272,11 @@ constexpr PieceType PieceTypeOf(Piece piece) {
     );
 }
 
+constexpr Color operator~(Color color) {
+    return ToColor(1 - ToInt(color));
+}
+
+
 
 #define DEFINE_ADD_SUB_OPERATORS(T) \
     constexpr T& operator++(T& t)             { t = T(ToInt(t) + 1); return t; } \
