@@ -10,6 +10,10 @@ public:
         return Move((ToInt(from) << FROM_SHIFT) | (ToInt(to) << TO_SHIFT));
     }
 
+    static Move NewDoublePawnPush(Square from, Square to) {
+        return Move((ToInt(from) << FROM_SHIFT) | (ToInt(to) << TO_SHIFT) | DOUBLE_PAWN_FLAG);
+    }
+
     static Move NewCapture(Square from, Square to) {
         return Move((ToInt(from) << FROM_SHIFT) | (ToInt(to) << TO_SHIFT) | CAPTURE_FLAG);
     }
