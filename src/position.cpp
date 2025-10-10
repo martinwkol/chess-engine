@@ -37,6 +37,9 @@ void Position::DoMove(Move move) {
         AddPiece(MakePiece(GetSideToMove(), move.GetPromotionType()), to);
     }
 
+    if (mSideToMove == Color::White)    UpdateCastlingRights<Color::White>(from, to);
+    else                                UpdateCastlingRights<Color::Black>(from, to);
+
     if (move.IsQuiet()) {
         ++mReversableHalfMovesCnt;
     }
@@ -293,7 +296,48 @@ static Bitboard PawnAttacks(Bitboard piecesBB, Bitboard occupancy) {
 }
 
 template <Color color>
-void Position::UpdateAttacks() {
+void Position::UpdateCastlingRights(Square from, Square to) {
+    constexpr Color other           = ~color;
+    constexpr BoardRank MySide      = color == Color::White ? BoardRank::R1 : BoardRank::R8;
+    constexpr BoardRank TheirSide   = other == Color::White ? BoardRank::R1 : BoardRank::R8;
+
+    constexpr Square MyQueenRook    = MakeSquare(BoardFile::A, MySide);
+    constexpr Square MyKingRook     = MakeSquare(BoardFile::H, MySide);
+    constexpr Square MyKing         = MakeSquare(BoardFile::E, MySide);
+    constexpr Square TheirQueenRook = MakeSquare(BoardFile::A, TheirSide);
+    constexpr Square TheirKingRook  = MakeSquare(BoardFile::H, TheirSide);
+    constexpr Square TheirKing      = MakeSquare(BoardFile::E, TheirSide);
+    
+    constexpr Bitboard MySideBB     = BB::SquareBB(MyQueenRook) | BB::SquareBB(MyKingRook) | BB::SquareBB(MyKing);
+    constexpr Bitboard TheirSideBB  = BB::SquareBB(TheirQueenRook) | BB::SquareBB(TheirKingRook) | BB::SquareBB(TheirKing);
+    constexpr Bitboard BothBB       = MySideBB | TheirSideBB;
+
+    Bitboard fromBB = BB::SquareBB(from);
+    Bitboard toBB   = BB::SquareBB(to);
+
+    if (BothBB & (fromBB | toBB)) {
+        if (MySideBB & fromBB) {
+            switch (from) {
+            case MyQueenRook:       mCastlingRights.ForbidCastlingQueenside<color>(); break;
+            case MyKingRook:        mCastlingRights.ForbidCastlingKingside<color>(); break;
+            case MyKing:            mCastlingRights.ForbidCastling<color>(); break;
+            default:                break;
+            }
+        }
+        if (TheirSideBB & toBB) {
+            switch (to) {
+            case TheirQueenRook:    mCastlingRights.ForbidCastlingQueenside<other>(); break;
+            case TheirKingRook:     mCastlingRights.ForbidCastlingKingside<other>(); break;
+            case TheirKing:         mCastlingRights.ForbidCastling<other>(); break;
+            default:                break;
+            }
+        }
+    }
+}
+
+template <Color color>
+void Position::UpdateAttacks()
+{
     Bitboard occupancy = GetOccupancy();
     Bitboard attacks = BB::NONE;
     attacks |= BigPieceAttacks<PieceType::King>(GetPiecesBB(color, PieceType::King), occupancy);

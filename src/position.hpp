@@ -70,6 +70,9 @@ private:
     void CapturePiece(Square from, Square to);
 
     template <Color color>
+    void UpdateCastlingRights(Square from, Square to);
+
+    template <Color color>
     void UpdateAttacks();
     void UpdateAttacks();
     template <Color color>
