@@ -9,14 +9,14 @@
 
 constexpr uint8_t DIRECTION_NUM = 8;
 enum class Direction : int8_t {
-    UP = 8,
-    UP_RIGHT = 9,
-    RIGHT = 1,
-    DOWN_RIGHT = -7,
-    DOWN = -8,
-    DOWN_LEFT = -9,
-    LEFT = -1,
-    UP_LEFT = 7
+    Up = 8,
+    UpRight = 9,
+    Right = 1,
+    DownRight = -7,
+    Down = -8,
+    DownLeft = -9,
+    Left = -1,
+    UpLeft = 7
 };
 
 constexpr int8_t ToInt(Direction direction) {

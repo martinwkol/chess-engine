@@ -44,10 +44,10 @@ static Move* GenerateCastlingMoves(Move* list, const Position& pos) {
     Bitboard attacked = pos.GetAttacks(Other);
     Square kingSquare = pos.GetKingPosition(This);
     if (castlingRights.CanCastleKingside<This>() && (KingsideGapBB & occupancy) == 0 && (KingsideTravelBB & attacked) == 0) {
-        *list++ = Move::NewKingsideCastle(kingSquare, kingSquare + Direction::RIGHT + Direction::RIGHT);
+        *list++ = Move::NewKingsideCastle(kingSquare, kingSquare + Direction::Right + Direction::Right);
     }
     if (castlingRights.CanCastleQueenside<This>() && (QueensideGapBB & occupancy) == 0 && (QueensideTravelBB & attacked) == 0) {
-        *list++ = Move::NewQueensideCastle(kingSquare, kingSquare + Direction::LEFT + Direction::LEFT);
+        *list++ = Move::NewQueensideCastle(kingSquare, kingSquare + Direction::Left + Direction::Left);
     }
     return list;
 }
@@ -117,7 +117,7 @@ template <Color This>
 static Move* GeneratePawnMoves(Move* list, const Position& pos, Bitboard allowedTargets) {
     constexpr Color Other = This == Color::White ? Color::Black : Color::White;
 
-    constexpr Direction Forward             = This == Color::White ? Direction::UP : Direction::DOWN;
+    constexpr Direction Forward             = This == Color::White ? Direction::Up : Direction::Down;
     constexpr BoardRank Rank3               = This == Color::White ? BoardRank::R3 : BoardRank::R6;
     constexpr BoardRank PrePromotionRank    = This == Color::White ? BoardRank::R7 : BoardRank::R2;
     constexpr BoardRank PromotionRank       = This == Color::White ? BoardRank::R8 : BoardRank::R1;
@@ -135,16 +135,16 @@ static Move* GeneratePawnMoves(Move* list, const Position& pos, Bitboard allowed
     
     Bitboard forwardSingle  = BB::Shift<Forward>(pawns) & free;
     Bitboard forwardDouble  = BB::Shift<Forward>(forwardSingle & Rank3BB) & free;
-    Bitboard captureLeft    = BB::Shift<Forward + Direction::LEFT>(pawns) & occupancyOther;
-    Bitboard captureRight   = BB::Shift<Forward + Direction::RIGHT>(pawns) & occupancyOther;
+    Bitboard captureLeft    = BB::Shift<Forward + Direction::Left>(pawns) & occupancyOther;
+    Bitboard captureRight   = BB::Shift<Forward + Direction::Right>(pawns) & occupancyOther;
     
     if (pawns & PrePromotionRankBB) {
         Bitboard forwardPromotion       = forwardSingle & PromotionRankBB;
         Bitboard captureLeftPromotion   = captureLeft & PromotionRankBB;
         Bitboard captureRightPromotion  = captureRight & PromotionRankBB;
         list = AddPromotions<Forward, Move::NewPromotionNormal>(list, forwardPromotion);
-        list = AddPromotions<Forward + Direction::LEFT, Move::NewPromotionCapture>(list, captureLeftPromotion);
-        list = AddPromotions<Forward + Direction::RIGHT, Move::NewPromotionCapture>(list, captureRightPromotion);
+        list = AddPromotions<Forward + Direction::Left, Move::NewPromotionCapture>(list, captureLeftPromotion);
+        list = AddPromotions<Forward + Direction::Right, Move::NewPromotionCapture>(list, captureRightPromotion);
         
         forwardSingle   &= ~PromotionRankBB;
         captureLeft     &= ~PromotionRankBB;
@@ -153,17 +153,17 @@ static Move* GeneratePawnMoves(Move* list, const Position& pos, Bitboard allowed
 
     list = AddNormalPawnMoves<Forward, Move::NewQuiet>(list, forwardSingle);
     list = AddNormalPawnMoves<Forward + Forward, Move::NewDoublePawnPush>(list, forwardDouble);
-    list = AddNormalPawnMoves<Forward + Direction::LEFT, Move::NewCapture>(list, captureLeft);
-    list = AddNormalPawnMoves<Forward + Direction::RIGHT, Move::NewCapture>(list, captureRight);
+    list = AddNormalPawnMoves<Forward + Direction::Left, Move::NewCapture>(list, captureLeft);
+    list = AddNormalPawnMoves<Forward + Direction::Right, Move::NewCapture>(list, captureRight);
 
     Square enPassant = pos.GetEnPassant();
     if (enPassant != Square::None && (BB::SquareBB(enPassant) & allowedTargets)) {
         Square captured = enPassant - Forward;
-        Square leftFrom = enPassant - (Forward + Direction::LEFT);
+        Square leftFrom = enPassant - (Forward + Direction::Left);
         if (pos.GetBoard(leftFrom) == MakePiece(This, PieceType::Pawn)) {
             list = tryEnPassant<This>(list, pos, leftFrom, enPassant, captured);
         }
-        Square rightFrom = enPassant - (Forward + Direction::RIGHT);
+        Square rightFrom = enPassant - (Forward + Direction::Right);
         if (pos.GetBoard(rightFrom) == MakePiece(This, PieceType::Pawn)) {
             list = tryEnPassant<This>(list, pos, rightFrom, enPassant, captured);
         }

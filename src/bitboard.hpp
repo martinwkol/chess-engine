@@ -157,9 +157,9 @@ inline Bitboard BB::Attacks(Square square, Bitboard occupancy) {
 template <Color color>
 inline constexpr Bitboard BB::PawnAttacks(Bitboard pawnBB) {
     if constexpr (color == Color::White) {
-        return Shift<Direction::UP_LEFT>(pawnBB) | Shift<Direction::UP_RIGHT>(pawnBB);
+        return Shift<Direction::UpLeft>(pawnBB) | Shift<Direction::UpRight>(pawnBB);
     } else {
-        return Shift<Direction::DOWN_LEFT>(pawnBB) | Shift<Direction::DOWN_RIGHT>(pawnBB);
+        return Shift<Direction::DownLeft>(pawnBB) | Shift<Direction::DownRight>(pawnBB);
     }
 }
 
@@ -188,9 +188,9 @@ inline Bitboard BB::Attacks(PieceType pieceType, Square square, Bitboard occupan
 
 inline constexpr Bitboard BB::PawnAttacks(Color color, Bitboard pawnBB) {
     if (color == Color::White) {
-        return Shift<Direction::UP_LEFT>(pawnBB) | Shift<Direction::UP_RIGHT>(pawnBB);
+        return Shift<Direction::UpLeft>(pawnBB) | Shift<Direction::UpRight>(pawnBB);
     } else {
-        return Shift<Direction::DOWN_LEFT>(pawnBB) | Shift<Direction::DOWN_RIGHT>(pawnBB);
+        return Shift<Direction::DownLeft>(pawnBB) | Shift<Direction::DownRight>(pawnBB);
     }
 }
 
