@@ -223,10 +223,53 @@ const char* Position::InitFromFEN_ExpectSpace(const char* fen) {
 }
 
 void Position::AddPiece(Piece piece, Square square) {
-    assert(mBoard[ToInt(square)] == Piece::None);
-    Board(square) = piece;
-    PiecesBB(piece) |= BB::SquareBB(square);
-    Occupied(ColorOf(piece)) |= BB::SquareBB(square);
+    assert(Board(square) == Piece::None);
+
+    Bitboard squareBB            = BB::SquareBB(square);
+    Board(square)                = piece;
+    PiecesBB(piece)             |= squareBB;
+    Occupied(ColorOf(piece))    |= squareBB;
+}
+
+void Position::RemovePiece(Square square) {
+    assert(Board(square) != Piece::None);
+
+    Bitboard squareBB        = BB::SquareBB(square);
+    Piece old                = Board(square);
+    Board(square)            = Piece::None;
+    PiecesBB(old)           ^= squareBB;
+    Occupied(ColorOf(old))  ^= squareBB;
+}
+
+void Position::MovePiece(Square from, Square to) {
+    assert(Board(from) != Piece::None);
+    assert(Board(to) == Piece::None);
+
+    Bitboard fromBB              = BB::SquareBB(from);
+    Bitboard toBB                = BB::SquareBB(to);
+    Bitboard bothBB              = fromBB | toBB;
+    Piece piece                  = Board(from);
+    Board(from)                  = Piece::None;
+    Board(to)                    = piece;
+    PiecesBB(piece)             ^= bothBB;
+    Occupied(ColorOf(piece))    ^= bothBB;
+}
+
+void Position::CapturePiece(Square from, Square to) {
+    assert(Board(from) != Piece::None);
+    assert(Board(to) != Piece::None);
+
+    Bitboard fromBB                      = BB::SquareBB(from);
+    Bitboard toBB                        = BB::SquareBB(to);
+    Bitboard bothBB                      = fromBB | toBB;
+    Piece movingPiece                    = Board(from);
+    Piece capturedPiece                  = Board(to);
+    Board(from)                          = Piece::None;
+    Board(to)                            = movingPiece;
+    PiecesBB(movingPiece)               ^= bothBB;
+    PiecesBB(capturedPiece)             ^= toBB;
+    Occupied(ColorOf(movingPiece))      ^= bothBB;
+    Occupied(ColorOf(capturedPiece))    ^= toBB;
 }
 
 template <PieceType PType>
