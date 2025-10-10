@@ -5,6 +5,49 @@
 #include <string>
 #include <sstream>
 
+void Position::DoMove(Move move) {
+    mEnPassant = Square::None;
+
+    Square from = move.GetFrom();
+    Square to = move.GetTo();
+    if (move.IsQuiet()) {
+        MovePiece(from, to);
+        if (move.IsDoublePawnPush()) {
+            mEnPassant = MiddleOf(from, to);
+        }
+    }
+    else if (move.IsNormalCapture()) {
+        CapturePiece(from, to);
+    }
+    else if (move.IsEnPassant()) {
+        Square captured = MakeSquare(FileOf(to), RankOf(from));
+        MovePiece(from, to);
+        RemovePiece(captured);
+    }
+    else if (move.IsCastle()) {
+        BoardFile rookFile = move.IsQueensideCastle() ? BoardFile::A : BoardFile::H;
+        Square rook = MakeSquare(rookFile, RankOf(from));
+        MovePiece(from, to);
+        MovePiece(rook, MiddleOf(from, to));
+    }
+    else {
+        assert(move.IsPromotion());
+        if (move.IsCapture()) RemovePiece(to);
+        RemovePiece(from);
+        AddPiece(MakePiece(GetSideToMove(), move.GetPromotionType()), to);
+    }
+
+    if (move.IsQuiet()) {
+        ++mReversableHalfMovesCnt;
+    }
+    else {
+        mReversableHalfMovesCnt = 0;
+    }
+    if (GetSideToMove() == Color::Black) ++mMoveNum;
+    UpdateAuxiliaryInfo();
+    mSideToMove = ~mSideToMove;
+}
+
 std::string Position::GetFEN() const {
     std::stringstream s;
     for (BoardRank rank = BoardRank::R8; rank >= BoardRank::R1; --rank) {

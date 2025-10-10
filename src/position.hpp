@@ -3,6 +3,7 @@
 #include "types.hpp"
 #include "bitboard.hpp"
 #include "castling_rights.hpp"
+#include "move.hpp"
 
 #include <string>
 
@@ -11,6 +12,8 @@ public:
     Position() { InitFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); }
     explicit Position(const char* fen) { InitFromFEN(fen); }
     explicit Position(const std::string& fen) { InitFromFEN(fen.c_str()); }
+
+    void DoMove(Move move);
 
     Bitboard GetPiecesBB(Color color, PieceType type) const { return mPiecesBB[ToInt(color)][ToInt(type)]; }
     Bitboard GetPiecesBB(Piece piece) const                 { return GetPiecesBB(ColorOf(piece), PieceTypeOf(piece)); }
@@ -62,6 +65,9 @@ private:
     const char* InitFromFEN_ExpectSpace(const char* fen);
     
     void AddPiece(Piece piece, Square square);
+    void RemovePiece(Square square);
+    void MovePiece(Square from, Square to);
+    void CapturePiece(Square from, Square to);
 
     template <Color color>
     void UpdateAttacks();
