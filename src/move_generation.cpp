@@ -56,7 +56,7 @@ template <Color This, PieceType PType>
 static Move* GenerateBigPieceMoves(Move* list, const Position& pos, Bitboard allowedTargets) {
     static_assert(PType != PieceType::King && PType != PieceType::Pawn);
 
-    Bitboard piecesBB = pos.GetPiecesBB(MakePiece(This, PType));
+    Bitboard piecesBB = pos.GetPiecesBB(This, PType);
     while (piecesBB) {
         Square from = BB::PopLsb(piecesBB);
         Bitboard movesBB = BB::Attacks<PType>(from, pos.GetOccupancy());
@@ -104,8 +104,8 @@ static Move* tryEnPassant(Move* list, const Position& pos, Square from, Square t
     constexpr Color Other = This == Color::White ? Color::Black : Color::White;
 
     Bitboard occupancyAfterEnPassant = pos.GetOccupancy() ^ (BB::SquareBB(from) | BB::SquareBB(to) | BB::SquareBB(captured));
-    Bitboard rooksOther = pos.GetPiecesBB(MakePiece(Other, PieceType::Rook));
-    Bitboard queensOther = pos.GetPiecesBB(MakePiece(Other, PieceType::Queen));
+    Bitboard rooksOther = pos.GetPiecesBB(Other, PieceType::Rook);
+    Bitboard queensOther = pos.GetPiecesBB(Other, PieceType::Queen);
     Bitboard kingRookAttack = BB::Attacks<PieceType::Rook>(pos.GetKingPosition(This), occupancyAfterEnPassant);
     if (!(kingRookAttack & (rooksOther | queensOther))) {
         *list++ = Move::NewEnPassant(from, to);
@@ -125,7 +125,7 @@ static Move* GeneratePawnMoves(Move* list, const Position& pos, Bitboard allowed
     constexpr Bitboard PrePromotionRankBB   = BB::RankBB(PrePromotionRank);
     constexpr Bitboard PromotionRankBB      = BB::RankBB(PromotionRank);
     
-    Bitboard pawns = pos.GetPiecesBB(MakePiece(This, PieceType::Pawn));
+    Bitboard pawns = pos.GetPiecesBB(This, PieceType::Pawn);
     if (!pawns) return list;
 
     Move* listStart = list;
@@ -172,7 +172,7 @@ static Move* GeneratePawnMoves(Move* list, const Position& pos, Bitboard allowed
     // Remove pawn moves that ignore a pin
     Bitboard pinnedPawns = pos.GetPinned(This) & pawns;
     if (pinnedPawns) {
-        Bitboard kingBB = pos.GetPiecesBB(MakePiece(This, PieceType::King));
+        Bitboard kingBB = pos.GetPiecesBB(This, PieceType::King);
         for (Move* pawnMoves = listStart; pawnMoves < list; ++pawnMoves) {
             Square from = pawnMoves->GetFrom();
             if ((BB::SquareBB(from) & pinnedPawns) && !(BB::Line(from, pawnMoves->GetTo()) & kingBB)) 
