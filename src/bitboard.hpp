@@ -170,17 +170,10 @@ inline Bitboard BB::Attacks(PieceType pieceType, Square square, Bitboard occupan
     assert(initialized);
 
     switch (pieceType) {
-    case PieceType::Queen:
-        return Attacks<PieceType::Queen>(square, occupancy);
-    
-    case PieceType::Rook:
-        return Attacks<PieceType::Rook>(square, occupancy);
-
-    case PieceType::Bishop:
-        return Attacks<PieceType::Bishop>(square, occupancy);
-
-    default:
-        return pseudoAttacks[ToInt(pieceType)][ToInt(square)];
+    case PieceType::Queen:  return Attacks<PieceType::Queen>(square, occupancy);
+    case PieceType::Rook:   return Attacks<PieceType::Rook>(square, occupancy);
+    case PieceType::Bishop: return Attacks<PieceType::Bishop>(square, occupancy);
+    default:                return pseudoAttacks[ToInt(pieceType)][ToInt(square)];
     }
 }
 
