@@ -21,7 +21,7 @@ static Move* GenerateNormalKingMoves(Move* list, const Position& pos, Bitboard a
 }
 
 template <Color This>
-static Move* GenerateCastlingMoves(Move* list, const Position& pos, Bitboard allowedTargets) {
+static Move* GenerateCastlingMoves(Move* list, const Position& pos) {
     constexpr Color Other = This == Color::White ? Color::Black : Color::White;
 
     constexpr BoardRank CastlingRank = This == Color::White ? BoardRank::R1 : BoardRank::R8;
@@ -55,8 +55,7 @@ static Move* GenerateCastlingMoves(Move* list, const Position& pos, Bitboard all
 template <Color This, PieceType PType>
 static Move* GenerateBigPieceMoves(Move* list, const Position& pos, Bitboard allowedTargets) {
     static_assert(PType != PieceType::King && PType != PieceType::Pawn);
-    constexpr Color Other = This == Color::White ? Color::Black : Color::White;
-
+    
     Bitboard piecesBB = pos.GetPiecesBB(MakePiece(This, PType));
     while (piecesBB) {
         Square from = BB::PopLsb(piecesBB);
@@ -100,8 +99,22 @@ static Move* AddPromotions(Move* list, Bitboard bb) {
     return list;
 }
 
+template <Color This>
+static Move* tryEnPassant(Move* list, const Position& pos, Square from, Square to, Square captured) {
+    constexpr Color Other = This == Color::White ? Color::Black : Color::White;
+
+    Bitboard occupancyAfterEnPassant = pos.GetOccupancy() ^ (BB::SquareBB(from) | BB::SquareBB(to) | BB::SquareBB(captured));
+    Bitboard rooksOther = pos.GetPiecesBB(MakePiece(Other, PieceType::Rook));
+    Bitboard queensOther = pos.GetPiecesBB(MakePiece(Other, PieceType::Queen));
+    Bitboard kingRookAttack = BB::Attacks<PieceType::Rook>(pos.GetKingPosition(This), occupancyAfterEnPassant);
+    if (!(kingRookAttack & (rooksOther | queensOther))) {
+        *list++ = Move::NewEnPassant(from, to);
+    }
+    return list;
+}
+
+template <Color This>
 static Move* GeneratePawnMoves(Move* list, const Position& pos, Bitboard allowedTargets) {
-    constexpr Color This = Color::White;
     constexpr Color Other = This == Color::White ? Color::Black : Color::White;
 
     constexpr Direction Forward             = This == Color::White ? Direction::UP : Direction::DOWN;
@@ -143,22 +156,35 @@ static Move* GeneratePawnMoves(Move* list, const Position& pos, Bitboard allowed
     list = AddNormalPawnMoves<Forward + Direction::LEFT, Move::NewCapture>(list, captureLeft);
     list = AddNormalPawnMoves<Forward + Direction::RIGHT, Move::NewCapture>(list, captureRight);
 
-    Bitboard pinnedPawns = pos.GetPinnedBB(This) & pawns;
+    Square enPassant = pos.GetEnPassant();
+    if (enPassant != Square::None && (BB::SquareBB(enPassant) & allowedTargets)) {
+        Square captured = enPassant - Forward;
+        Square leftFrom = enPassant - (Forward + Direction::LEFT);
+        if (pos.GetBoard(leftFrom) == MakePiece(This, PieceType::Pawn)) {
+            list = tryEnPassant<This>(list, pos, leftFrom, enPassant, captured);
+        }
+        Square rightFrom = enPassant - (Forward + Direction::RIGHT);
+        if (pos.GetBoard(rightFrom) == MakePiece(This, PieceType::Pawn)) {
+            list = tryEnPassant<This>(list, pos, rightFrom, enPassant, captured);
+        }
+    }
+
+    // Remove pawn moves that ignore a pin
+    Bitboard pinnedPawns = pos.GetPinned(This) & pawns;
     if (pinnedPawns) {
+        Bitboard kingBB = pos.GetPiecesBB(MakePiece(This, PieceType::King));
         for (Move* pawnMoves = listStart; pawnMoves < list; ++pawnMoves) {
             Square from = pawnMoves->GetFrom();
-            if (
-                (BB::SquareBB(from) & pinnedPawns) && 
-                !(BB::Line(from, pawnMoves->GetTo()) & pos.GetPiecesBB(MakePiece(This, PieceType::King)))
-            ) *pawnMoves = *(--list);
+            if ((BB::SquareBB(from) & pinnedPawns) && !(BB::Line(from, pawnMoves->GetTo()) & kingBB)) 
+                *pawnMoves = *(--list);
         }
     }
     
+    return list;
 }
 
+template <Color This>
 static Move* GenerateMoves(Move* list, const Position& pos) {
-    constexpr Color This = Color::White;
-
     Bitboard ThisOccupied = pos.GetOccupancy(This);
     Bitboard allowedTargets = ~ThisOccupied;
     Bitboard kingAttackers = pos.GetKingAttackers();
@@ -176,23 +202,21 @@ static Move* GenerateMoves(Move* list, const Position& pos) {
         Square attackerSquare = BB::Lsb(kingAttackers);
         allowedTargets &= BB::Between(kingSquare, attackerSquare) | kingAttackers;
     } else {
-        list = GenerateCastlingMoves<This>(list, pos, allowedTargets);
+        list = GenerateCastlingMoves<This>(list, pos);
     }
 
     list = GenerateBigPieceMoves<This, PieceType::Queen>(list, pos, allowedTargets);
     list = GenerateBigPieceMoves<This, PieceType::Rook>(list, pos, allowedTargets);
     list = GenerateBigPieceMoves<This, PieceType::Bishop>(list, pos, allowedTargets);
     list = GenerateBigPieceMoves<This, PieceType::Knight>(list, pos, allowedTargets);
-
-
+    list = GeneratePawnMoves<This>(list, pos, allowedTargets);
+    return list;
 }
 
 void GenerateMoves(const Position& pos, MoveList& moveList) {
-    /*
     if (pos.GetSideToMove() == Color::White) {
         moveList.SetEnd(GenerateMoves<Color::White>(moveList.begin(), pos));
     } else {
         moveList.SetEnd(GenerateMoves<Color::Black>(moveList.begin(), pos));
     }
-    */
 }
