@@ -183,3 +183,42 @@ void Position::AddPiece(Piece piece, Square square) {
     PiecesBB(piece) |= BB::SquareBB(square);
     Occupied(ColorOf(piece)) |= BB::SquareBB(square);
 }
+
+template <PieceType PType>
+static Bitboard BigPieceAttacks(Bitboard piecesBB, Bitboard occupancy) {
+    Bitboard attacks = BB::NONE;
+    while (piecesBB) {
+        Square square = BB::PopLsb(piecesBB);
+        attacks |= BB::Attacks<PType>(square, occupancy);
+    }
+    return attacks;
+}
+
+template <PieceType PType>
+static Bitboard PawnAttacks(Bitboard piecesBB, Bitboard occupancy) {
+    Bitboard attacks = BB::NONE;
+    while (piecesBB) {
+        Square square = BB::PopLsb(piecesBB);
+        attacks |= BB::Attacks<PType>(square, occupancy);
+    }
+    return attacks;
+}
+
+template <Color color>
+void Position::UpdateAttacks() {
+    Bitboard occupancy = GetOccupancy();
+    Bitboard attacks = BB::NONE;
+    attacks |= BigPieceAttacks<PieceType::King>(GetPiecesBB(color, PieceType::King), occupancy);
+    attacks |= BigPieceAttacks<PieceType::Queen>(GetPiecesBB(color, PieceType::Queen), occupancy);
+    attacks |= BigPieceAttacks<PieceType::Rook>(GetPiecesBB(color, PieceType::Rook), occupancy);
+    attacks |= BigPieceAttacks<PieceType::Bishop>(GetPiecesBB(color, PieceType::Bishop), occupancy);
+    attacks |= BigPieceAttacks<PieceType::Knight>(GetPiecesBB(color, PieceType::Knight), occupancy);
+    attacks |= BB::PawnAttacks(color, GetPiecesBB(color, PieceType::Pawn));
+    Attacks(color) = attacks;
+}
+
+void Position::UpdateAttacks() {
+    UpdateAttacks<Color::White>();
+    UpdateAttacks<Color::Black>();
+}
+
