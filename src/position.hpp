@@ -16,9 +16,12 @@ public:
 
     Bitboard GetPiecesBB(Piece piece) const { return mPiecesBB[ToInt(ColorOf(piece))][ToInt(PieceTypeOf(piece))]; }
     Piece GetBoard(Square square) const { return mBoard[ToInt(square)]; }
+    CastlingRights GetCastlingRights() const { return mCastlingRights; }
+    Square GetKingPosition(Color color) const { return BB::Lsb(GetPiecesBB(MakePiece(color, PieceType::King))); }
 
     Bitboard GetOccupancy(Color color) const { return mOccupied[ToInt(color)]; }
     Bitboard GetOccupancy() const { return mOccupied[ToInt(Color::White)] | mOccupied[ToInt(Color::Black)]; }
+    Bitboard GetAttacks(Color color) const { return mAttacks[ToInt(color)]; }
 
     Bitboard GetKingAttackers() const { return mKingAttackers; }
 
@@ -35,6 +38,7 @@ private:
     uint32_t mMoveNum                               = 1;
 
     Bitboard mOccupied[COLOR_NUM]                   = { BB::NONE };
+    Bitboard mAttacks[COLOR_NUM]                    = { BB::NONE };
     Bitboard mKingAttackers                         = BB::NONE;
 
     void InitFromFEN(const char* fen);
