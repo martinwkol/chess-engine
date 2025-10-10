@@ -22,7 +22,7 @@ public:
     Bitboard GetOccupancy(Color color) const { return mOccupied[ToInt(color)]; }
     Bitboard GetOccupancy() const { return mOccupied[ToInt(Color::White)] | mOccupied[ToInt(Color::Black)]; }
     Bitboard GetAttacks(Color color) const { return mAttacks[ToInt(color)]; }
-    Bitboard GetPinned(Color color) const { return mPinned[ToInt(color)]; }
+    Bitboard GetPinnedBB(Color color) const { return mPinned[ToInt(color)]; }
     Bitboard GetKingAttackers() const { return mKingAttackers; }
 
     Color GetSideToMove() const { return mSideToMove; }

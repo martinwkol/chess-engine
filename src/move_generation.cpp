@@ -77,6 +77,85 @@ static Move* GenerateBigPieceMoves(Move* list, const Position& pos, Bitboard all
     return list;
 }
 
+template <Direction Dir, Move (&NewMove)(Square, Square)>
+static Move* AddNormalPawnMoves(Move* list, Bitboard bb) {
+    while (bb) {
+        Square to = BB::PopLsb(bb);
+        Square from = to - Dir;
+        *list++ = NewMove(from, to);
+    }
+    return list;
+}
+
+template <Direction Dir, Move (&NewMove)(Square, Square, PieceType)>
+static Move* AddPromotions(Move* list, Bitboard bb) {
+    while (bb) {
+        Square to = BB::PopLsb(bb);
+        Square from = to - Dir;
+        *list++ = NewMove(from, to, PieceType::Knight);
+        *list++ = NewMove(from, to, PieceType::Bishop);
+        *list++ = NewMove(from, to, PieceType::Rook);
+        *list++ = NewMove(from, to, PieceType::Queen);
+    }
+    return list;
+}
+
+static Move* GeneratePawnMoves(Move* list, const Position& pos, Bitboard allowedTargets) {
+    constexpr Color This = Color::White;
+    constexpr Color Other = This == Color::White ? Color::Black : Color::White;
+
+    constexpr Direction Forward             = This == Color::White ? Direction::UP : Direction::DOWN;
+    constexpr BoardRank Rank3               = This == Color::White ? BoardRank::R3 : BoardRank::R6;
+    constexpr BoardRank PrePromotionRank    = This == Color::White ? BoardRank::R7 : BoardRank::R2;
+    constexpr BoardRank PromotionRank       = This == Color::White ? BoardRank::R8 : BoardRank::R1;
+    constexpr Bitboard Rank3BB              = BB::RankBB(Rank3);
+    constexpr Bitboard PrePromotionRankBB   = BB::RankBB(PrePromotionRank);
+    constexpr Bitboard PromotionRankBB      = BB::RankBB(PromotionRank);
+    
+    Bitboard pawns = pos.GetPiecesBB(MakePiece(This, PieceType::Pawn));
+    if (!pawns) return list;
+
+    Move* listStart = list;
+
+    Bitboard free           = ~pos.GetOccupancy() & allowedTargets;
+    Bitboard occupancyOther = pos.GetOccupancy(Other) & allowedTargets;
+    
+    Bitboard forwardSingle  = BB::Shift<Forward>(pawns) & free;
+    Bitboard forwardDouble  = BB::Shift<Forward>(forwardSingle & Rank3BB) & free;
+    Bitboard captureLeft    = BB::Shift<Forward + Direction::LEFT>(pawns) & occupancyOther;
+    Bitboard captureRight   = BB::Shift<Forward + Direction::RIGHT>(pawns) & occupancyOther;
+    
+    if (pawns & PrePromotionRankBB) {
+        Bitboard forwardPromotion       = forwardSingle & PromotionRankBB;
+        Bitboard captureLeftPromotion   = captureLeft & PromotionRankBB;
+        Bitboard captureRightPromotion  = captureRight & PromotionRankBB;
+        list = AddPromotions<Forward, Move::NewPromotionNormal>(list, forwardPromotion);
+        list = AddPromotions<Forward + Direction::LEFT, Move::NewPromotionCapture>(list, captureLeftPromotion);
+        list = AddPromotions<Forward + Direction::RIGHT, Move::NewPromotionCapture>(list, captureRightPromotion);
+        
+        forwardSingle   &= ~PromotionRankBB;
+        captureLeft     &= ~PromotionRankBB;
+        captureRight    &= ~PromotionRankBB;
+    }
+
+    list = AddNormalPawnMoves<Forward, Move::NewQuiet>(list, forwardSingle);
+    list = AddNormalPawnMoves<Forward + Forward, Move::NewDoublePawnPush>(list, forwardDouble);
+    list = AddNormalPawnMoves<Forward + Direction::LEFT, Move::NewCapture>(list, captureLeft);
+    list = AddNormalPawnMoves<Forward + Direction::RIGHT, Move::NewCapture>(list, captureRight);
+
+    Bitboard pinnedPawns = pos.GetPinnedBB(This) & pawns;
+    if (pinnedPawns) {
+        for (Move* pawnMoves = listStart; pawnMoves < list; ++pawnMoves) {
+            Square from = pawnMoves->GetFrom();
+            if (
+                (BB::SquareBB(from) & pinnedPawns) && 
+                !(BB::Line(from, pawnMoves->GetTo()) & pos.GetPiecesBB(MakePiece(This, PieceType::King)))
+            ) *pawnMoves = *(--list);
+        }
+    }
+    
+}
+
 static Move* GenerateMoves(Move* list, const Position& pos) {
     constexpr Color This = Color::White;
 
@@ -105,7 +184,7 @@ static Move* GenerateMoves(Move* list, const Position& pos) {
     list = GenerateBigPieceMoves<This, PieceType::Bishop>(list, pos, allowedTargets);
     list = GenerateBigPieceMoves<This, PieceType::Knight>(list, pos, allowedTargets);
 
-    
+
 }
 
 void GenerateMoves(const Position& pos, MoveList& moveList) {
