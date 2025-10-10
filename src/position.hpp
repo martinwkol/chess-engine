@@ -22,7 +22,7 @@ public:
     Bitboard GetOccupancy(Color color) const { return mOccupied[ToInt(color)]; }
     Bitboard GetOccupancy() const { return mOccupied[ToInt(Color::White)] | mOccupied[ToInt(Color::Black)]; }
     Bitboard GetAttacks(Color color) const { return mAttacks[ToInt(color)]; }
-
+    Bitboard GetPinned(Color color) const { return mPinned[ToInt(color)]; }
     Bitboard GetKingAttackers() const { return mKingAttackers; }
 
     Color GetSideToMove() const { return mSideToMove; }
@@ -39,6 +39,7 @@ private:
 
     Bitboard mOccupied[COLOR_NUM]                   = { BB::NONE };
     Bitboard mAttacks[COLOR_NUM]                    = { BB::NONE };
+    Bitboard mPinned[COLOR_NUM]                     = { BB::NONE };
     Bitboard mKingAttackers                         = BB::NONE;
 
     void InitFromFEN(const char* fen);
