@@ -75,6 +75,8 @@ void Position::InitFromFEN(const char *fen) {
     fen = InitFromFEN_ExpectSpace(fen);
 
     fen = InitFromFEN_MoveNum(fen);
+
+    UpdateAuxiliaryInfo();
 }
 
 const char* Position::InitFromFEN_PiecePosition(const char* fen) {
