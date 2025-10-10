@@ -50,6 +50,9 @@ public:
     static Bitboard Attacks(PieceType pieceType, Square square);
     static Bitboard Attacks(PieceType pieceType, Square square, Bitboard occupancy);
     template <Color color>
+    static constexpr Bitboard PawnAttacks(Bitboard pawnBB);
+    static constexpr Bitboard PawnAttacks(Color color, Bitboard pawnBB);
+    template <Color color>
     static constexpr Bitboard PawnAttacks(Square square);
     static constexpr Bitboard PawnAttacks(Color color, Square square);
 
@@ -152,13 +155,17 @@ inline Bitboard BB::Attacks(Square square, Bitboard occupancy) {
 }
 
 template <Color color>
-constexpr Bitboard BB::PawnAttacks(Square square) {
-    constexpr Bitboard squareBB = SquareBB(square);
+inline constexpr Bitboard BB::PawnAttacks(Bitboard pawnBB) {
     if constexpr (color == Color::White) {
-        return Shift<Direction::UP_LEFT>(squareBB) | Shift<Direction::UP_RIGHT>(squareBB);
+        return Shift<Direction::UP_LEFT>(pawnBB) | Shift<Direction::UP_RIGHT>(pawnBB);
     } else {
-        return Shift<Direction::DOWN_LEFT>(squareBB) | Shift<Direction::DOWN_RIGHT>(squareBB);
+        return Shift<Direction::DOWN_LEFT>(pawnBB) | Shift<Direction::DOWN_RIGHT>(pawnBB);
     }
+}
+
+template <Color color>
+constexpr Bitboard BB::PawnAttacks(Square square) {
+    return PawnAttacks<color>(SquareBB(square));
 }
 
 inline Bitboard BB::Attacks(PieceType pieceType, Square square) {
@@ -179,13 +186,16 @@ inline Bitboard BB::Attacks(PieceType pieceType, Square square, Bitboard occupan
     }
 }
 
-inline constexpr Bitboard BB::PawnAttacks(Color color, Square square) {
-    const Bitboard squareBB = SquareBB(square);
+inline constexpr Bitboard BB::PawnAttacks(Color color, Bitboard pawnBB) {
     if (color == Color::White) {
-        return Shift<Direction::UP_LEFT>(squareBB) | Shift<Direction::UP_RIGHT>(squareBB);
+        return Shift<Direction::UP_LEFT>(pawnBB) | Shift<Direction::UP_RIGHT>(pawnBB);
     } else {
-        return Shift<Direction::DOWN_LEFT>(squareBB) | Shift<Direction::DOWN_RIGHT>(squareBB);
+        return Shift<Direction::DOWN_LEFT>(pawnBB) | Shift<Direction::DOWN_RIGHT>(pawnBB);
     }
+}
+
+inline constexpr Bitboard BB::PawnAttacks(Color color, Square square) {
+    return PawnAttacks(color, SquareBB(square));
 }
 
 inline Bitboard BB::Between(Square sq1, Square sq2) {
