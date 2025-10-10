@@ -47,6 +47,7 @@ private:
     const char* InitFromFEN_PiecePosition(const char* fen);
     const char* InitFromFEN_SideToMove(const char* fen);
     const char* InitFromFEN_CastlingRights(const char* fen);
+    const char* InitFromFEN_EnPassant(const char* fen);
     const char* InitFromFEN_ReversableHalfMoves(const char* fen);
     const char* InitFromFEN_MoveNum(const char* fen);
     const char* InitFromFEN_ExpectSpace(const char* fen);

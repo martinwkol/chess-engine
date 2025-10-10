@@ -47,6 +47,12 @@ std::string Position::GetFEN() const {
         s << '-';
     }
 
+    if (mEnPassant != Square::None) {
+        s << ' ' << ('a' + ToInt(FileOf(mEnPassant))) << ('1' + ToInt(RankOf(mEnPassant)));
+    } else {
+        s << ' ' << '-';
+    }
+
     s << ' ' << mReversableHalfMovesCnt << ' ' << mMoveNum;
 
     return s.str();
@@ -55,12 +61,19 @@ std::string Position::GetFEN() const {
 void Position::InitFromFEN(const char *fen) {
     fen = InitFromFEN_PiecePosition(fen);
     fen = InitFromFEN_ExpectSpace(fen);
+
     fen = InitFromFEN_SideToMove(fen);
     fen = InitFromFEN_ExpectSpace(fen);
+
     fen = InitFromFEN_CastlingRights(fen);
     fen = InitFromFEN_ExpectSpace(fen);
+
+    fen = InitFromFEN_EnPassant(fen);
+    fen = InitFromFEN_ExpectSpace(fen);
+
     fen = InitFromFEN_ReversableHalfMoves(fen);
     fen = InitFromFEN_ExpectSpace(fen);
+
     fen = InitFromFEN_MoveNum(fen);
 }
 
@@ -129,6 +142,22 @@ const char* Position::InitFromFEN_CastlingRights(const char* fen) {
     }
     if (mCastlingRights == CastlingRights::NONE) throw std::invalid_argument("Illegal fen: invalid castling rights");
     return fen;
+}
+
+const char *Position::InitFromFEN_EnPassant(const char *fen) {
+    if (*fen == '-') {
+        mEnPassant = Square::None;
+        return fen + 1;
+    }
+
+    if (*fen < 'a' || 'h' < *fen) throw std::invalid_argument("Illegal fen: invalid en passant");
+    BoardFile file = ToBoardFile(*fen - 'a');
+    ++fen;
+
+    if (*fen < '1' || '8' < *fen) throw std::invalid_argument("Illegal fen: invalid en passant");
+    BoardRank rank = ToBoardRank(*fen - '1');
+    mEnPassant = MakeSquare(file, rank);
+    return fen + 1;
 }
 
 const char* Position::InitFromFEN_ReversableHalfMoves(const char* fen) {
