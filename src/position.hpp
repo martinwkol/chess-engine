@@ -67,5 +67,10 @@ private:
     void UpdateAttacks();
     void UpdateAttacks();
 
+    template <Color color>
+    void UpdatePinned();
+    void UpdatePinned();
+
+    
 
 };

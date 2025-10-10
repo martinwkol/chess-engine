@@ -222,3 +222,36 @@ void Position::UpdateAttacks() {
     UpdateAttacks<Color::Black>();
 }
 
+
+template <Color color>
+void Position::UpdatePinned() {
+    constexpr Color other = color == Color::White ? Color::Black : Color::White;
+    Bitboard queensBB = GetPiecesBB(other, PieceType::Queen);
+    Bitboard rooksBB = GetPiecesBB(other, PieceType::Rook);
+    Bitboard bishopsBB = GetPiecesBB(other, PieceType::Bishop);
+    Bitboard straightSlidersBB = queensBB | rooksBB;
+    Bitboard diagonalSlidersBB = queensBB | bishopsBB;
+
+    Square kingSquare = GetKingPosition(color);
+    Bitboard occupancyOther = GetOccupancy(other);
+    Bitboard straightAttack = BB::Attacks<PieceType::Rook>(kingSquare, occupancyOther);
+    Bitboard diagonalAttack = BB::Attacks<PieceType::Bishop>(kingSquare, occupancyOther);
+    
+    Bitboard straightAttackersBB = straightAttack & straightSlidersBB;
+    Bitboard diagonalAttackersBB = diagonalAttack & diagonalSlidersBB;
+
+    Bitboard slideAttackersBB = straightAttackersBB | diagonalAttackersBB;
+    Bitboard pinnedBB = BB::NONE;
+    while (slideAttackersBB) {
+        Square attackerSq = BB::PopLsb(slideAttackersBB);
+        Bitboard between = BB::Between(kingSquare, attackerSq);
+        Bitboard blockedByBB = between & GetOccupancy(color);
+        if (blockedByBB && !BB::AtLeast2(blockedByBB)) pinnedBB |= blockedByBB;
+    }
+    Pinned(color) = pinnedBB;
+}
+
+void Position::UpdatePinned() {
+    UpdatePinned<Color::White>();
+    UpdatePinned<Color::Black>();
+}
