@@ -152,4 +152,5 @@ void Position::AddPiece(Piece piece, Square square) {
     assert(mBoard[ToInt(square)] == Piece::None);
     Board(square) = piece;
     PiecesBB(piece) |= BB::SquareBB(square);
+    Occupied(ColorOf(piece)) |= BB::SquareBB(square);
 }
