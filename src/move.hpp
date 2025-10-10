@@ -48,22 +48,22 @@ public:
 
     Move() = default;
 
-    Square GetFrom() const { return ToSquare((mMove >> FROM_SHIFT) & FROM_MASK); }
-    Square GetTo() const { return ToSquare((mMove >> TO_SHIFT) & TO_MASK); }
+    Square GetFrom() const              { return ToSquare((mMove >> FROM_SHIFT) & FROM_MASK); }
+    Square GetTo() const                { return ToSquare((mMove >> TO_SHIFT) & TO_MASK); }
 
-    bool IsPromotion() const { return (mMove & PROMOTION_FLAG) != 0; }
-    PieceType GetPromotionType() const { assert(IsPromotion()); return ToPieceType((mMove >> PROMOTION_TYPE_SHIFT) & PROMOTION_TYPE_MASK); }
+    bool IsPromotion() const            { return (mMove & PROMOTION_FLAG) != 0; }
+    PieceType GetPromotionType() const  { assert(IsPromotion()); return ToPieceType((mMove >> PROMOTION_TYPE_SHIFT) & PROMOTION_TYPE_MASK); }
     
-    bool IsCapture() const { return (mMove & CAPTURE_FLAG) != 0; }
-    bool IsEnPassant() const { return (mMove & FLAGS_MASK) == EN_PASSANT_FLAGS; }
+    bool IsCapture() const              { return (mMove & CAPTURE_FLAG) != 0; }
+    bool IsEnPassant() const            { return (mMove & FLAGS_MASK) == EN_PASSANT_FLAGS; }
     
-    bool IsCastle() const { return (mMove & FLAGS_EXCEPT_FIRST) == CASTLE_FLAG; }
-    bool IsKingsideCastle() const { return (mMove & FLAGS_MASK) == KINGSIDE_CASTLE_FLAGS; }
-    bool IsQueensideCastle() const { return (mMove & FLAGS_MASK) == QUEENSIDE_CASTLE_FLAGS; }
+    bool IsCastle() const               { return (mMove & FLAGS_EXCEPT_FIRST) == CASTLE_FLAG; }
+    bool IsKingsideCastle() const       { return (mMove & FLAGS_MASK) == KINGSIDE_CASTLE_FLAGS; }
+    bool IsQueensideCastle() const      { return (mMove & FLAGS_MASK) == QUEENSIDE_CASTLE_FLAGS; }
     
-    bool IsDoublePawnPush() const { return (mMove & FLAGS_MASK) == DOUBLE_PAWN_FLAG; }
+    bool IsDoublePawnPush() const       { return (mMove & FLAGS_MASK) == DOUBLE_PAWN_FLAG; }
 
-    bool IsQuiet() const { return (mMove & FLAGS_MASK) == 0; }
+    bool IsQuiet() const                { return (mMove & FLAGS_MASK) == 0; }
     
 
 private:
