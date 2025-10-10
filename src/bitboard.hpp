@@ -8,6 +8,8 @@ using Bitboard = uint64_t;
 
 /**
  * Static class for bitboard operations
+ * See https://www.chessprogramming.org/Bitboards
+ * Based on the implementation of Bitboards in the Stockfish-Engine: https://github.com/official-stockfish/Stockfish
  */
 class BB {
 public:
