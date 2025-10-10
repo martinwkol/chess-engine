@@ -149,6 +149,12 @@ constexpr BoardRank RankOf(Square square) {
     );
 }
 
+constexpr Square MiddleOf(Square sq1, Square sq2) {
+    assert(IsValid(sq1));
+    assert(IsValid(sq2));
+    return ToSquare((ToInt(sq1) + ToInt(sq2)) >> 1);
+}
+
 constexpr Square operator+(Square square, Direction direction) {
     return ToSquare(ToInt(square) + ToInt(direction));
 }
