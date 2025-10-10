@@ -63,7 +63,7 @@ public:
     
     bool IsDoublePawnPush() const       { return (mMove & FLAGS_MASK) == DOUBLE_PAWN_FLAG; }
 
-    bool IsQuiet() const                { return (mMove & FLAGS_MASK) == 0; }
+    bool IsQuiet() const                { return (mMove & FLAGS_EXCEPT_FIRST) == 0; }
     
 
 private:
