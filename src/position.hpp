@@ -20,6 +20,8 @@ public:
     Bitboard GetOccupancy(Color color) const { return mOccupied[ToInt(color)]; }
     Bitboard GetOccupancy() const { return mOccupied[ToInt(Color::White)] | mOccupied[ToInt(Color::Black)]; }
 
+    Bitboard GetKingAttackers() const { return mKingAttackers; }
+
     Color GetSideToMove() const { return mSideToMove; }
     
 
@@ -33,6 +35,7 @@ private:
     uint32_t mMoveNum                               = 1;
 
     Bitboard mOccupied[COLOR_NUM]                   = { BB::NONE };
+    Bitboard mKingAttackers                         = BB::NONE;
 
     void InitFromFEN(const char* fen);
     const char* InitFromFEN_PiecePosition(const char* fen);
