@@ -11,23 +11,24 @@ public:
     Position() { InitFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); }
     explicit Position(const char* fen) { InitFromFEN(fen); }
     explicit Position(const std::string& fen) { InitFromFEN(fen.c_str()); }
+
+    Bitboard GetPiecesBB(Piece piece) const     { return mPiecesBB[ToInt(ColorOf(piece))][ToInt(PieceTypeOf(piece))]; }
+    Piece GetBoard(Square square) const         { return mBoard[ToInt(square)]; }
+    Color GetSideToMove() const                 { return mSideToMove; }
+    CastlingRights GetCastlingRights() const    { return mCastlingRights; }
+    Square GetEnPassant() const                 { return mEnPassant; }
+    uint32_t GetReversableHalfMovesCnt() const  { return mReversableHalfMovesCnt; }
+    uint32_t GetMoveNum() const                 { return mMoveNum; }
     
+    Square GetKingPosition(Color color) const   { return BB::Lsb(GetPiecesBB(MakePiece(color, PieceType::King))); }
+
+    Bitboard GetOccupancy(Color color) const    { return mOccupied[ToInt(color)]; }
+    Bitboard GetOccupancy() const               { return mOccupied[ToInt(Color::White)] | mOccupied[ToInt(Color::Black)]; }
+    Bitboard GetAttacks(Color color) const      { return mAttacks[ToInt(color)]; }
+    Bitboard GetPinned(Color color) const       { return mPinned[ToInt(color)]; }
+    Bitboard GetKingAttackers() const           { return mKingAttackers; }
+
     std::string GetFEN() const;
-
-    Bitboard GetPiecesBB(Piece piece) const { return mPiecesBB[ToInt(ColorOf(piece))][ToInt(PieceTypeOf(piece))]; }
-    Piece GetBoard(Square square) const { return mBoard[ToInt(square)]; }
-    CastlingRights GetCastlingRights() const { return mCastlingRights; }
-    Square GetEnPassant() const { return mEnPassant; }
-    Square GetKingPosition(Color color) const { return BB::Lsb(GetPiecesBB(MakePiece(color, PieceType::King))); }
-
-    Bitboard GetOccupancy(Color color) const { return mOccupied[ToInt(color)]; }
-    Bitboard GetOccupancy() const { return mOccupied[ToInt(Color::White)] | mOccupied[ToInt(Color::Black)]; }
-    Bitboard GetAttacks(Color color) const { return mAttacks[ToInt(color)]; }
-    Bitboard GetPinned(Color color) const { return mPinned[ToInt(color)]; }
-    Bitboard GetKingAttackers() const { return mKingAttackers; }
-
-    Color GetSideToMove() const { return mSideToMove; }
-    
 
 private:
     Bitboard mPiecesBB[COLOR_NUM][PIECE_TYPE_NUM]   = { BB::NONE };
@@ -55,7 +56,7 @@ private:
     void AddPiece(Piece piece, Square square);
 
     Bitboard& PiecesBB(Piece piece) { return mPiecesBB[ToInt(ColorOf(piece))][ToInt(PieceTypeOf(piece))]; }
-    Piece& Board(Square square) { return mBoard[ToInt(square)]; }
+    Piece& Board(Square square)     { return mBoard[ToInt(square)]; }
     Bitboard& Occupied(Color color) { return mOccupied[ToInt(color)]; }
     
 };
