@@ -15,6 +15,7 @@ public:
     explicit Position(const std::string& fen) { InitFromFEN(fen.c_str()); }
 
     void DoMove(Move move);
+    void UndoMove();
 
     Bitboard GetPiecesBB(Color color, PieceType type) const { return mPiecesBB[ToInt(color)][ToInt(type)]; }
     Bitboard GetPiecesBB(Piece piece) const                 { return GetPiecesBB(ColorOf(piece), PieceTypeOf(piece)); }

@@ -6,20 +6,22 @@
 #include <sstream>
 
 void Position::DoMove(Move move) {
+    Square from = move.GetFrom();
+    Square to = move.GetTo();
+
     RestoreInfo restoreInfo;
     restoreInfo.move                    = move;
-    restoreInfo.capturedPiece           = Piece::None;
+    restoreInfo.capturedPiece           = move.IsCapture() ? GetBoard(to) : Piece::None;
     restoreInfo.enPassant               = mEnPassant;
     restoreInfo.castlingRights          = mCastlingRights;
     restoreInfo.reversableHalfMovesCnt  = mReversableHalfMovesCnt;
     restoreInfo.attacks                 = mAttacks;
     restoreInfo.pinned                  = mPinned;
     restoreInfo.kingAttackers           = mKingAttackers;
+    mHistory[mHistoryNext++] = restoreInfo;
 
     mEnPassant = Square::None;
 
-    Square from = move.GetFrom();
-    Square to = move.GetTo();
     if (move.IsQuiet()) {
         MovePiece(from, to);
         if (move.IsDoublePawnPush()) {
@@ -27,7 +29,6 @@ void Position::DoMove(Move move) {
         }
     }
     else if (move.IsNormalCapture()) {
-        restoreInfo.capturedPiece = GetBoard(to);
         CapturePiece(from, to);
     }
     else if (move.IsEnPassant()) {
@@ -58,10 +59,47 @@ void Position::DoMove(Move move) {
         mReversableHalfMovesCnt = 0;
     }
     if (GetSideToMove() == Color::Black) ++mMoveNum;
-    
+
     UpdateAuxiliaryInfo();
     mSideToMove = ~mSideToMove;
-    mHistory[mHistoryNext++] = restoreInfo;
+}
+
+void Position::UndoMove() {
+    RestoreInfo restoreInfo = mHistory[--mHistoryNext];
+
+    Square from = restoreInfo.move.GetFrom();
+    Square to = restoreInfo.move.GetTo();
+    if (restoreInfo.move.IsQuiet() || restoreInfo.move.IsNormalCapture()) {
+        MovePiece(to, from);
+    }
+    else if (restoreInfo.move.IsEnPassant()) {
+        Square captured = MakeSquare(FileOf(to), RankOf(from));
+        MovePiece(to, from);
+        AddPiece(MakePiece(mSideToMove, PieceType::Pawn), captured);
+    }
+    else if (restoreInfo.move.IsCastle()) {
+        BoardFile rookFile = restoreInfo.move.IsQueensideCastle() ? BoardFile::A : BoardFile::H;
+        Square rook = MakeSquare(rookFile, RankOf(from));
+        MovePiece(to, from);
+        MovePiece(MiddleOf(from, to), rook);
+    }
+    else {
+        assert(restoreInfo.move.IsPromotion());
+        RemovePiece(to);
+        AddPiece(MakePiece(~mSideToMove, PieceType::Pawn), from);
+    }
+
+    if (restoreInfo.capturedPiece != Piece::None) AddPiece(restoreInfo.capturedPiece, to);
+
+    mEnPassant              = restoreInfo.enPassant;
+    mCastlingRights         = restoreInfo.castlingRights;
+    mReversableHalfMovesCnt = restoreInfo.reversableHalfMovesCnt;
+    mAttacks                = restoreInfo.attacks;
+    mPinned                 = restoreInfo.pinned;
+    mKingAttackers          = restoreInfo.kingAttackers;
+
+    if (mSideToMove == Color::White) mMoveNum--;
+    mSideToMove = ~mSideToMove;
 }
 
 std::string Position::GetFEN() const {
