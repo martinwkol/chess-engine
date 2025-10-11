@@ -6,6 +6,7 @@
 #include "move.hpp"
 
 #include <string>
+#include <array>
 
 class Position {
 public:
@@ -43,9 +44,9 @@ private:
     uint32_t mReversableHalfMovesCnt                = 0;
     uint32_t mMoveNum                               = 1;
 
-    Bitboard mOccupied[COLOR_NUM]                   = { BB::NONE };
-    Bitboard mAttacks[COLOR_NUM]                    = { BB::NONE };
-    Bitboard mPinned[COLOR_NUM]                     = { BB::NONE };
+    std::array<Bitboard, COLOR_NUM> mOccupied       = { BB::NONE };
+    std::array<Bitboard, COLOR_NUM> mAttacks        = { BB::NONE };
+    std::array<Bitboard, COLOR_NUM> mPinned         = { BB::NONE };
     Bitboard mKingAttackers                         = BB::NONE;
 
     Bitboard& PiecesBB(Color color, PieceType type) { return mPiecesBB[ToInt(color)][ToInt(type)]; }
