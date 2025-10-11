@@ -213,10 +213,10 @@ static Move* GenerateMoves(Move* list, const Position& pos) {
     return list;
 }
 
-void GenerateMoves(const Position& pos, MoveList& moveList) {
+Move* GenerateMoves(Move* list, const Position& pos) {
     if (pos.GetSideToMove() == Color::White) {
-        moveList.SetEnd(GenerateMoves<Color::White>(moveList.begin(), pos));
+        return GenerateMoves<Color::White>(list, pos);
     } else {
-        moveList.SetEnd(GenerateMoves<Color::Black>(moveList.begin(), pos));
+        return GenerateMoves<Color::Black>(list, pos);
     }
 }

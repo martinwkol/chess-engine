@@ -1,12 +1,12 @@
 #pragma once
 
+#include "position.hpp"
 #include "move.hpp"
+#include "move_generation.hpp"
 
 class MoveList {
 public:
-    MoveList() { mEnd = mMoves; }
-
-    void SetEnd(Move* end) { mEnd = end; }
+    MoveList(const Position& pos) { mEnd = GenerateMoves(mMoves, pos); }
 
     Move* begin() { return mMoves; }
     Move* end() { return mEnd; }
