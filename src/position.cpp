@@ -208,6 +208,7 @@ const char* Position::InitFromFEN_PiecePosition(const char* fen) {
                 default: throw std::invalid_argument("Illegal fen: illegal piece type");
             }
             AddPiece(MakePiece(color, type), MakeSquare(file, rank));
+            ++file;
         }
     }
     return fen;
