@@ -191,12 +191,12 @@ static Move* GenerateMoves(Move* list, const Position& pos) {
 
     list = GenerateNormalKingMoves<This>(list, pos, allowedTargets);
 
-    if (BB::AtLeast2(kingAttackers)) {
-        // Double check -> only king moves
+    if (pos.IsDoubleCheck()) {
+        // Only normal king moves
         return list;
     }
 
-    if (kingAttackers) {
+    if (pos.IsCheck()) {
         // King in check -> block or capture attacker
         Square kingSquare = pos.GetKingPosition(This);
         Square attackerSquare = BB::Lsb(kingAttackers);

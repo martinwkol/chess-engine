@@ -34,6 +34,9 @@ public:
     Bitboard GetPinned(Color color) const       { return mPinned[ToInt(color)]; }
     Bitboard GetKingAttackers() const           { return mKingAttackers; }
 
+    bool IsCheck() const                        { return mKingAttackers != 0; }
+    bool IsDoubleCheck() const                  { return BB::AtLeast2(mKingAttackers); }
+
     std::string GetFEN() const;
 
 private:
