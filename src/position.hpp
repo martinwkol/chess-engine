@@ -36,6 +36,19 @@ public:
     std::string GetFEN() const;
 
 private:
+    static constexpr int MAX_HALF_MOVES = 4096;
+
+    struct RestoreInfo {
+        Move move;
+        Piece capturedPiece;
+        Square enPassant;
+        CastlingRights castlingRights;
+        uint32_t reversableHalfMovesCnt;
+        std::array<Bitboard, COLOR_NUM> attacks;
+        std::array<Bitboard, COLOR_NUM> pinned;
+        Bitboard kingAttackers;
+    };
+
     Bitboard mPiecesBB[COLOR_NUM][PIECE_TYPE_NUM]   = { BB::NONE };
     Piece mBoard[SQUARE_NUM]                        = { Piece::None };
     Color mSideToMove                               = Color::White;
@@ -48,6 +61,9 @@ private:
     std::array<Bitboard, COLOR_NUM> mAttacks        = { BB::NONE };
     std::array<Bitboard, COLOR_NUM> mPinned         = { BB::NONE };
     Bitboard mKingAttackers                         = BB::NONE;
+
+    RestoreInfo mHistory[MAX_HALF_MOVES];
+    uint32_t mHistoryNext                           = 0;
 
     Bitboard& PiecesBB(Color color, PieceType type) { return mPiecesBB[ToInt(color)][ToInt(type)]; }
     Bitboard& PiecesBB(Piece piece)                 { return PiecesBB(ColorOf(piece), PieceTypeOf(piece)); }

@@ -6,6 +6,16 @@
 #include <sstream>
 
 void Position::DoMove(Move move) {
+    RestoreInfo restoreInfo;
+    restoreInfo.move                    = move;
+    restoreInfo.capturedPiece           = Piece::None;
+    restoreInfo.enPassant               = mEnPassant;
+    restoreInfo.castlingRights          = mCastlingRights;
+    restoreInfo.reversableHalfMovesCnt  = mReversableHalfMovesCnt;
+    restoreInfo.attacks                 = mAttacks;
+    restoreInfo.pinned                  = mPinned;
+    restoreInfo.kingAttackers           = mKingAttackers;
+
     mEnPassant = Square::None;
 
     Square from = move.GetFrom();
@@ -17,6 +27,7 @@ void Position::DoMove(Move move) {
         }
     }
     else if (move.IsNormalCapture()) {
+        restoreInfo.capturedPiece = GetBoard(to);
         CapturePiece(from, to);
     }
     else if (move.IsEnPassant()) {
@@ -47,8 +58,10 @@ void Position::DoMove(Move move) {
         mReversableHalfMovesCnt = 0;
     }
     if (GetSideToMove() == Color::Black) ++mMoveNum;
+    
     UpdateAuxiliaryInfo();
     mSideToMove = ~mSideToMove;
+    mHistory[mHistoryNext++] = restoreInfo;
 }
 
 std::string Position::GetFEN() const {
