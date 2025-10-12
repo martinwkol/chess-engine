@@ -53,17 +53,17 @@ private:
         Bitboard kingAttackers;
     };
 
-    Bitboard mPiecesBB[COLOR_NUM][PIECE_TYPE_NUM]   = { BB::NONE };
-    Piece mBoard[SQUARE_NUM]                        = { Piece::None };
+    std::array<std::array<Bitboard, PIECE_TYPE_NUM>, COLOR_NUM> mPiecesBB;
+    std::array<Piece, SQUARE_NUM> mBoard;
     Color mSideToMove                               = Color::White;
     CastlingRights mCastlingRights                  = CastlingRights::ALL;
     Square mEnPassant                               = Square::None;
     uint32_t mReversableHalfMovesCnt                = 0;
     uint32_t mMoveNum                               = 1;
 
-    std::array<Bitboard, COLOR_NUM> mOccupied       = { BB::NONE };
-    std::array<Bitboard, COLOR_NUM> mAttacks        = { BB::NONE };
-    std::array<Bitboard, COLOR_NUM> mPinned         = { BB::NONE };
+    std::array<Bitboard, COLOR_NUM> mOccupied;
+    std::array<Bitboard, COLOR_NUM> mAttacks;
+    std::array<Bitboard, COLOR_NUM> mPinned;
     Bitboard mKingAttackers                         = BB::NONE;
 
     RestoreInfo mHistory[MAX_HALF_MOVES];

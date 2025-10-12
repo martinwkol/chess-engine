@@ -156,6 +156,14 @@ std::string Position::GetFEN() const {
 }
 
 void Position::InitFromFEN(const char *fen) {
+    mPiecesBB[ToInt(Color::White)].fill(BB::NONE);
+    mPiecesBB[ToInt(Color::Black)].fill(BB::NONE);
+    mBoard.fill(Piece::None);
+    mOccupied.fill(BB::NONE);
+    mAttacks.fill(BB::NONE);
+    mPinned.fill(BB::NONE);
+    
+
     fen = InitFromFEN_PiecePosition(fen);
     fen = InitFromFEN_ExpectSpace(fen);
 
