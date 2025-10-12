@@ -33,8 +33,8 @@ void Position::DoMove(Move move) {
     }
     else if (move.IsEnPassant()) {
         Square captured = MakeSquare(FileOf(to), RankOf(from));
-        MovePiece(from, to);
         RemovePiece(captured);
+        MovePiece(from, to);
     }
     else if (move.IsCastle()) {
         BoardFile rookFile = move.IsQueensideCastle() ? BoardFile::A : BoardFile::H;
