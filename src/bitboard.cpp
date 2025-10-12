@@ -251,9 +251,11 @@ Bitboard* BB::InitMagicBitboards(PieceType pieceType, Square square, Bitboard* t
    
     Magic& attacks = pieceType == PieceType::Rook ? rookAttacks[squareInt] : bishopAttacks[squareInt];
     attacks.table = tableStart;
-    for (Bitboard occupancy = attacks.mask; occupancy; occupancy = (occupancy - 1) & attacks.mask) {
+
+    for (Bitboard occupancy = attacks.mask; ; occupancy = (occupancy - 1) & attacks.mask) {
         uint64_t index = attacks.TableIndex(occupancy);
         attacks.table[index] = computeAttack(square, occupancy);
+        if (!occupancy) break;
     }
 
     assert(Count1s(attacks.mask) == 64u - attacks.shift);
