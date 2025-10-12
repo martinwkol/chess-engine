@@ -290,7 +290,7 @@ void BB::InitLine() {
                 BoardRank rank = RankOf(sq1) + drank;
                 while (IsValid(file) && IsValid(rank)) {
                     Square sq2 = MakeSquare(file, rank);
-                    between[ToInt(sq1)][ToInt(sq2)] = bb;
+                    line[ToInt(sq1)][ToInt(sq2)] = bb;
                 }
             }
         }
