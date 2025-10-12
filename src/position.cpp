@@ -396,8 +396,7 @@ void Position::UpdateCastlingRights(Square from, Square to) {
 }
 
 template <Color color>
-void Position::UpdateAttacks()
-{
+void Position::UpdateAttacks() {
     Bitboard occupancy = GetOccupancy();
     Bitboard attacks = BB::NONE;
     attacks |= BigPieceAttacks<PieceType::King>(GetPiecesBB(color, PieceType::King), occupancy);
@@ -405,16 +404,16 @@ void Position::UpdateAttacks()
     attacks |= BigPieceAttacks<PieceType::Rook>(GetPiecesBB(color, PieceType::Rook), occupancy);
     attacks |= BigPieceAttacks<PieceType::Bishop>(GetPiecesBB(color, PieceType::Bishop), occupancy);
     attacks |= BigPieceAttacks<PieceType::Knight>(GetPiecesBB(color, PieceType::Knight), occupancy);
-    attacks |= BB::PawnAttacks(color, GetPiecesBB(color, PieceType::Pawn));
+    attacks |= BB::PawnAttacks<color>(GetPiecesBB(color, PieceType::Pawn));
     Attacks(color) = attacks;
 }
 
 template <Color color>
 void Position::UpdatePins() {
-    constexpr Color other = color == Color::White ? Color::Black : Color::White;
-    Bitboard queensBB = GetPiecesBB(other, PieceType::Queen);
-    Bitboard rooksBB = GetPiecesBB(other, PieceType::Rook);
-    Bitboard bishopsBB = GetPiecesBB(other, PieceType::Bishop);
+    constexpr Color other = ~color;
+    Bitboard queensBB   = GetPiecesBB(other, PieceType::Queen);
+    Bitboard rooksBB    = GetPiecesBB(other, PieceType::Rook);
+    Bitboard bishopsBB  = GetPiecesBB(other, PieceType::Bishop);
     Bitboard straightSlidersBB = queensBB | rooksBB;
     Bitboard diagonalSlidersBB = queensBB | bishopsBB;
 
@@ -426,18 +425,18 @@ void Position::UpdatePins() {
     Bitboard straightAttackersBB = straightAttack & straightSlidersBB;
     Bitboard diagonalAttackersBB = diagonalAttack & diagonalSlidersBB;
 
-    Bitboard slideAttackersBB = straightAttackersBB | diagonalAttackersBB;
-    Bitboard pinnedBB = BB::NONE;
+    Bitboard slideAttackersBB   = straightAttackersBB | diagonalAttackersBB;
+    Bitboard pinnedBB           = BB::NONE;
     while (slideAttackersBB) {
-        Square attackerSq = BB::PopLsb(slideAttackersBB);
-        Bitboard between = BB::Between(kingSquare, attackerSq);
-        Bitboard blockedByBB = between & GetOccupancy(color);
+        Square attackerSq       = BB::PopLsb(slideAttackersBB);
+        Bitboard between        = BB::Between(kingSquare, attackerSq);
+        Bitboard blockedByBB    = between & GetOccupancy(color);
         if (blockedByBB && !BB::AtLeast2(blockedByBB)) pinnedBB |= blockedByBB;
     }
     Pinned(color) = pinnedBB;
 }
 
-void Position::UpdateKingAttacks() {
+void Position::UpdateKingAttackers() {
     mKingAttackers = BB::NONE;
 
     Color thisSide      = GetSideToMove();
@@ -464,5 +463,5 @@ void Position::UpdateAuxiliaryInfo() {
     UpdateAttacks<Color::Black>();
     UpdatePins<Color::White>();
     UpdatePins<Color::Black>();
-    UpdateKingAttacks();
+    UpdateKingAttackers();
 }

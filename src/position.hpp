@@ -97,7 +97,7 @@ private:
     void UpdateAttacks();
     template <Color color>
     void UpdatePins();
-    void UpdateKingAttacks();
+    void UpdateKingAttackers();
     void UpdateAuxiliaryInfo();
 
 };
