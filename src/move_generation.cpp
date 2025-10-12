@@ -170,7 +170,7 @@ static Move* GeneratePawnMoves(Move* list, const Position& pos, Bitboard allowed
         for (Move* pawnMoves = listStart; pawnMoves < list; ++pawnMoves) {
             Square from = pawnMoves->GetFrom();
             if ((BB::SquareBB(from) & pinnedPawns) && !(BB::Line(from, pawnMoves->GetTo()) & kingBB)) 
-                *pawnMoves = *(--list);
+                *pawnMoves-- = *(--list);
         }
     }
     
