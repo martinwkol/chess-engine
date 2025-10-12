@@ -321,6 +321,7 @@ void Position::MovePiece(Square from, Square to) {
 void Position::CapturePiece(Square from, Square to) {
     assert(Board(from) != Piece::None);
     assert(Board(to) != Piece::None);
+    assert(PieceTypeOf(Board(to)) != PieceType::King);
 
     Bitboard fromBB                      = BB::SquareBB(from);
     Bitboard toBB                        = BB::SquareBB(to);
