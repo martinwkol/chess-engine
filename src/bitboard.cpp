@@ -262,8 +262,6 @@ Bitboard* BB::InitMagicBitboards(PieceType pieceType, Square square, Bitboard* t
 
 void BB::InitBetween() {
     for (Square sq1 = Square::A1; sq1 <= Square::H8; ++sq1) {
-        BoardFile file = FileOf(sq1);
-        BoardRank rank = RankOf(sq1);
         for (int drank = -1; drank <= 1; ++drank) {
             for (int dfile = -1; dfile <= 1; ++dfile) {
                 if (drank == 0 && dfile == 0) continue;
@@ -283,14 +281,17 @@ void BB::InitBetween() {
 
 void BB::InitLine() {
     for (Square sq1 = Square::A1; sq1 <= Square::H8; ++sq1) {
-        for (Direction dir : { 
-            Direction::Up, Direction::UpRight, Direction::Right, 
-            Direction::DownRight, Direction::Down, Direction::DownLeft, 
-            Direction::Left, Direction::UpLeft 
-        }) {
-            Bitboard bb = SlideAttack(sq1, dir, 0) | SlideAttack(sq1, -dir, 0) | SquareBB(sq1);
-            for (Square sq2 = sq1 + dir; IsValid(sq2); sq2 += dir) {
-                between[ToInt(sq1)][ToInt(sq2)] = bb;
+        for (int drank = -1; drank <= 1; ++drank) {
+            for (int dfile = -1; dfile <= 1; ++dfile) {
+                if (drank == 0 && dfile == 0) continue;
+                Direction dir = ToDirection(drank * BOARD_FILE_NUM + dfile);
+                Bitboard bb = SlideAttack(sq1, dir, 0) | SlideAttack(sq1, -dir, 0) | SquareBB(sq1);
+                BoardFile file = FileOf(sq1) + dfile;
+                BoardRank rank = RankOf(sq1) + drank;
+                while (IsValid(file) && IsValid(rank)) {
+                    Square sq2 = MakeSquare(file, rank);
+                    between[ToInt(sq1)][ToInt(sq2)] = bb;
+                }
             }
         }
     }
