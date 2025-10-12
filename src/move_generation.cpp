@@ -100,9 +100,10 @@ static Move* AddPromotions(Move* list, Bitboard bb) {
 }
 
 template <Color This>
-static Move* tryEnPassant(Move* list, const Position& pos, Square from, Square to, Square captured) {
+static Move* tryEnPassant(Move* list, const Position& pos, Square from, Square to) {
     constexpr Color Other = This == Color::White ? Color::Black : Color::White;
 
+    Square captured = MakeSquare(FileOf(to), RankOf(from));
     Bitboard occupancyAfterEnPassant = pos.GetOccupancy() ^ (BB::SquareBB(from) | BB::SquareBB(to) | BB::SquareBB(captured));
     Bitboard rooksOther = pos.GetPiecesBB(Other, PieceType::Rook);
     Bitboard queensOther = pos.GetPiecesBB(Other, PieceType::Queen);
@@ -158,14 +159,10 @@ static Move* GeneratePawnMoves(Move* list, const Position& pos, Bitboard allowed
 
     Square enPassant = pos.GetEnPassant();
     if (enPassant != Square::None && (BB::SquareBB(enPassant) & allowedTargets)) {
-        Square captured = enPassant - Forward;
-        Square leftFrom = enPassant - (Forward + Direction::Left);
-        if (pos.GetBoard(leftFrom) == MakePiece(This, PieceType::Pawn)) {
-            list = tryEnPassant<This>(list, pos, leftFrom, enPassant, captured);
-        }
-        Square rightFrom = enPassant - (Forward + Direction::Right);
-        if (pos.GetBoard(rightFrom) == MakePiece(This, PieceType::Pawn)) {
-            list = tryEnPassant<This>(list, pos, rightFrom, enPassant, captured);
+        Bitboard enPassantingPawns = BB::PawnAttacks<Other>(enPassant) & pawns;
+        while (enPassantingPawns) {
+            Square from = BB::PopLsb(enPassantingPawns);
+            list = tryEnPassant<This>(list, pos, from, enPassant);
         }
     }
 
