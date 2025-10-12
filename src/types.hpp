@@ -95,35 +95,26 @@ constexpr bool IsValid(Square square) {
 }
 
 constexpr BoardFile ToBoardFile(int8_t n) {
-    BoardFile file = static_cast<BoardFile>(n);
-    assert(IsValid(file));
-    return file;
+    return static_cast<BoardFile>(n);
 }
 
 constexpr int8_t ToInt(BoardFile file) {
-    assert(IsValid(file));
     return static_cast<int8_t>(file);
 }
 
 constexpr BoardRank ToBoardRank(int8_t n) {
-    BoardRank rank = static_cast<BoardRank>(n);
-    assert(IsValid(rank));
-    return rank;
+    return static_cast<BoardRank>(n);
 }
 
 constexpr int8_t ToInt(BoardRank rank) {
-    assert(IsValid(rank));
     return static_cast<int8_t>(rank);
 }
 
 constexpr Square ToSquare(int8_t n) {
-    Square square = static_cast<Square>(n);
-    assert(IsValid(square));
-    return square;
+    return static_cast<Square>(n);
 }
 
 constexpr int8_t ToInt(Square square) {
-    assert(IsValid(square));
     return static_cast<int8_t>(square);
 }
 
