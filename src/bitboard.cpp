@@ -1,6 +1,5 @@
 #include "bitboard.hpp"
 
-#include <initializer_list>
 #include <iostream>
 
 namespace {
@@ -263,15 +262,20 @@ Bitboard* BB::InitMagicBitboards(PieceType pieceType, Square square, Bitboard* t
 
 void BB::InitBetween() {
     for (Square sq1 = Square::A1; sq1 <= Square::H8; ++sq1) {
-        for (Direction dir : { 
-            Direction::Up, Direction::UpRight, Direction::Right, 
-            Direction::DownRight, Direction::Down, Direction::DownLeft, 
-            Direction::Left, Direction::UpLeft 
-        }) {
-            Bitboard bb = SquareBB(sq1 + dir);
-            for (Square sq2 = sq1 + dir + dir; IsValid(sq2); sq2 += dir) {
-                between[ToInt(sq1)][ToInt(sq2)] = bb;
-                bb |= SquareBB(sq2);
+        BoardFile file = FileOf(sq1);
+        BoardRank rank = RankOf(sq1);
+        for (int drank = -1; drank <= 1; ++drank) {
+            for (int dfile = -1; dfile <= 1; ++dfile) {
+                if (drank == 0 && dfile == 0) continue;
+                Bitboard bb = BB::NONE;
+                BoardFile file = FileOf(sq1) + dfile;
+                BoardRank rank = RankOf(sq1) + drank;
+                while (IsValid(file) && IsValid(rank)) {
+                    Square sq2 = MakeSquare(file, rank);
+                    between[ToInt(sq1)][ToInt(sq2)] = bb;
+                    bb |= SquareBB(sq2);
+                    file += dfile; rank += drank;
+                }
             }
         }
     }
