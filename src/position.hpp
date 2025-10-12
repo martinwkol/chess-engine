@@ -33,6 +33,7 @@ public:
     Bitboard GetAttacks(Color color) const      { return mAttacks[ToInt(color)]; }
     Bitboard GetPinned(Color color) const       { return mPinned[ToInt(color)]; }
     Bitboard GetKingAttackers() const           { return mKingAttackers; }
+    Bitboard GetCheckSquares() const            { return mCheckSquares; }
 
     bool IsCheck() const                        { return mKingAttackers != BB::NONE; }
     bool IsDoubleCheck() const                  { return BB::AtLeast2(mKingAttackers); }
@@ -51,6 +52,7 @@ private:
         std::array<Bitboard, COLOR_NUM> attacks;
         std::array<Bitboard, COLOR_NUM> pinned;
         Bitboard kingAttackers;
+        Bitboard checkSquares;
     };
 
     std::array<std::array<Bitboard, PIECE_TYPE_NUM>, COLOR_NUM> mPiecesBB;
@@ -65,6 +67,7 @@ private:
     std::array<Bitboard, COLOR_NUM> mAttacks;
     std::array<Bitboard, COLOR_NUM> mPinned;
     Bitboard mKingAttackers                         = BB::NONE;
+    Bitboard mCheckSquares                          = BB::NONE;
 
     RestoreInfo mHistory[MAX_HALF_MOVES];
     uint32_t mHistoryNext                           = 0;

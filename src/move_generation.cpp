@@ -2,12 +2,9 @@
 
 template <Color This>
 static Move* GenerateNormalKingMoves(Move* list, const Position& pos, Bitboard allowedTargets) {
-    constexpr Color Other = This == Color::White ? Color::Black : Color::White;
-
     Square from = pos.GetKingPosition(This);
     Bitboard movesBB = BB::Attacks<PieceType::King>(from);
-    Bitboard attacked = pos.GetAttacks(Other);
-    movesBB &= ~attacked; // King may not move into check
+    movesBB &= ~pos.GetCheckSquares(); // King may not move into check
     movesBB &= allowedTargets;
     while (movesBB) {
         Square to = BB::PopLsb(movesBB);

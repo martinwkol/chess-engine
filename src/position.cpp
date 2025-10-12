@@ -18,6 +18,7 @@ void Position::DoMove(Move move) {
     restoreInfo.attacks                 = mAttacks;
     restoreInfo.pinned                  = mPinned;
     restoreInfo.kingAttackers           = mKingAttackers;
+    restoreInfo.checkSquares            = mCheckSquares;
     mHistory[mHistoryNext++] = restoreInfo;
 
     mEnPassant = Square::None;
@@ -97,6 +98,7 @@ void Position::UndoMove() {
     mAttacks                = restoreInfo.attacks;
     mPinned                 = restoreInfo.pinned;
     mKingAttackers          = restoreInfo.kingAttackers;
+    mCheckSquares           = restoreInfo.checkSquares;
 
     if (mSideToMove == Color::White) mMoveNum--;
     mSideToMove = ~mSideToMove;
@@ -428,25 +430,35 @@ void Position::UpdatePins() {
 }
 
 void Position::UpdateKingAttackers() {
-    mKingAttackers = BB::NONE;
-
     Color thisSide      = GetSideToMove();
     Color opposingSide  = ~thisSide;
+
+    mKingAttackers  = BB::NONE;
+    mCheckSquares   = Attacks(opposingSide);
 
     if (!(GetAttacks(opposingSide) & GetPiecesBB(thisSide, PieceType::King))) return;
     
     Bitboard opposingQueens     = GetPiecesBB(opposingSide, PieceType::Queen);
     Bitboard opposingRooks      = GetPiecesBB(opposingSide, PieceType::Rook);
     Bitboard opposingBishops    = GetPiecesBB(opposingSide, PieceType::Bishop);
-    Bitboard straightAttackers  = opposingQueens | opposingRooks;
-    Bitboard diagonalAttackers  = opposingQueens | opposingBishops;
+    Bitboard sliders            = opposingQueens | opposingRooks | opposingBishops;
+    Bitboard straightSliders    = opposingQueens | opposingRooks;
+    Bitboard diagonalSliders    = opposingQueens | opposingBishops;
 
     Square kingSq       = GetKingPosition(thisSide);
     Bitboard occupancy  = GetOccupancy();
-    mKingAttackers |= BB::Attacks<PieceType::Rook>(kingSq, occupancy) & straightAttackers;
-    mKingAttackers |= BB::Attacks<PieceType::Bishop>(kingSq, occupancy) & diagonalAttackers;
+    mKingAttackers |= BB::Attacks<PieceType::Rook>(kingSq, occupancy) & straightSliders;
+    mKingAttackers |= BB::Attacks<PieceType::Bishop>(kingSq, occupancy) & diagonalSliders;
     mKingAttackers |= BB::Attacks<PieceType::Knight>(kingSq) & GetPiecesBB(opposingSide, PieceType::Knight);
     mKingAttackers |= BB::PawnAttacks(thisSide, kingSq) & GetPiecesBB(opposingSide, PieceType::Pawn);
+
+    Bitboard slidingAttackers = mKingAttackers & sliders;
+    while (slidingAttackers) {
+        Square attacker          = BB::PopLsb(slidingAttackers);
+        Piece piece              = Board(attacker);
+        Bitboard occupancyNoKing = GetOccupancy() ^ PiecesBB(thisSide, PieceType::King);
+        mCheckSquares           |= BB::Attacks(PieceTypeOf(piece), attacker, occupancyNoKing);
+    }
 }
 
 void Position::UpdateAuxiliaryInfo() {
