@@ -60,8 +60,8 @@ void Position::DoMove(Move move) {
     }
     if (GetSideToMove() == Color::Black) ++mMoveNum;
 
-    UpdateAuxiliaryInfo();
     mSideToMove = ~mSideToMove;
+    UpdateAuxiliaryInfo();
 }
 
 void Position::UndoMove() {
