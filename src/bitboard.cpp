@@ -1,6 +1,7 @@
 #include "bitboard.hpp"
 
 #include <initializer_list>
+#include <iostream>
 
 namespace {
     Bitboard attacksTable[(1 << 12) * SQUARE_NUM + (1 << 9) * SQUARE_NUM];
@@ -297,4 +298,22 @@ void BB::Init() {
     InitBetween();
     InitLine();
     initialized = true;
+}
+
+void BB::PrintBitboard(Bitboard bb) {
+    for (BoardRank rank = BoardRank::R8; rank >= BoardRank::R1; --rank) {
+        std::cout << "  +";
+        for (BoardFile file = BoardFile::A; file <= BoardFile::H; ++file) std::cout << "---+";
+        std::cout << '\n' << char('1' + ToInt(rank)) << " |";
+        for (BoardFile file = BoardFile::A; file <= BoardFile::H; ++file) {
+            std::cout << ' ' << (bb & SquareBB(MakeSquare(file, rank)) ? 'X' : ' ') << " |";
+        }
+        std::cout << '\n';
+    }
+    std::cout << "  +";
+    for (BoardFile file = BoardFile::A; file <= BoardFile::H; ++file) std::cout << "---+";
+    std::cout << '\n' << "   ";
+    for (BoardFile file = BoardFile::A; file <= BoardFile::H; ++file) 
+        std::cout << ' ' << char('A' + ToInt(file)) << "  ";
+    std::cout << '\n';
 }

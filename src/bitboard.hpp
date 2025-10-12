@@ -66,6 +66,8 @@ public:
     static Square Lsb(Bitboard bb);
     static Square PopLsb(Bitboard& bb);
 
+    static void PrintBitboard(Bitboard bb);
+
     BB() = delete;
 
 private:
