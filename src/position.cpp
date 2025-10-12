@@ -336,26 +336,6 @@ void Position::CapturePiece(Square from, Square to) {
     Occupied(ColorOf(capturedPiece))    ^= toBB;
 }
 
-template <PieceType PType>
-static Bitboard BigPieceAttacks(Bitboard piecesBB, Bitboard occupancy) {
-    Bitboard attacks = BB::NONE;
-    while (piecesBB) {
-        Square square = BB::PopLsb(piecesBB);
-        attacks |= BB::Attacks<PType>(square, occupancy);
-    }
-    return attacks;
-}
-
-template <PieceType PType>
-static Bitboard PawnAttacks(Bitboard piecesBB, Bitboard occupancy) {
-    Bitboard attacks = BB::NONE;
-    while (piecesBB) {
-        Square square = BB::PopLsb(piecesBB);
-        attacks |= BB::Attacks<PType>(square, occupancy);
-    }
-    return attacks;
-}
-
 template <Color color>
 void Position::UpdateCastlingRights(Square from, Square to) {
     constexpr Color other           = ~color;
@@ -394,6 +374,16 @@ void Position::UpdateCastlingRights(Square from, Square to) {
             }
         }
     }
+}
+
+template <PieceType PType>
+static Bitboard BigPieceAttacks(Bitboard piecesBB, Bitboard occupancy) {
+    Bitboard attacks = BB::NONE;
+    while (piecesBB) {
+        Square square = BB::PopLsb(piecesBB);
+        attacks |= BB::Attacks<PType>(square, occupancy);
+    }
+    return attacks;
 }
 
 template <Color color>
