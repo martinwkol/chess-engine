@@ -291,6 +291,7 @@ void BB::InitLine() {
                 while (IsValid(file) && IsValid(rank)) {
                     Square sq2 = MakeSquare(file, rank);
                     line[ToInt(sq1)][ToInt(sq2)] = bb;
+                    file += dfile; rank += drank;
                 }
             }
         }
