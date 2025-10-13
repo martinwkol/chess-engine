@@ -128,13 +128,16 @@ static Move* GeneratePawnMoves(Move* list, const Position& pos, Bitboard allowed
 
     Move* listStart = list;
 
-    Bitboard free           = ~pos.GetOccupancy() & allowedTargets;
-    Bitboard occupancyOther = pos.GetOccupancy(Other) & allowedTargets;
+    Bitboard free           = ~pos.GetOccupancy();
+    Bitboard occupancyOther = pos.GetOccupancy(Other);
+    Bitboard allowedForward = free & allowedTargets;
+    Bitboard allowedCapture = occupancyOther & allowedTargets;
     
-    Bitboard forwardSingle  = BB::Shift<Forward>(pawns) & free;
-    Bitboard forwardDouble  = BB::Shift<Forward>(forwardSingle & Rank3BB) & free;
-    Bitboard captureLeft    = BB::Shift<Forward + Direction::Left>(pawns) & occupancyOther;
-    Bitboard captureRight   = BB::Shift<Forward + Direction::Right>(pawns) & occupancyOther;
+    Bitboard forwardFree    = BB::Shift<Forward>(pawns) & free;
+    Bitboard forwardSingle  = forwardFree & allowedTargets;
+    Bitboard forwardDouble  = BB::Shift<Forward>(forwardFree & Rank3BB) & allowedForward;
+    Bitboard captureLeft    = BB::Shift<Forward + Direction::Left>(pawns) & allowedCapture;
+    Bitboard captureRight   = BB::Shift<Forward + Direction::Right>(pawns) & allowedCapture;
     
     if (pawns & PrePromotionRankBB) {
         Bitboard forwardPromotion       = forwardSingle & PromotionRankBB;
