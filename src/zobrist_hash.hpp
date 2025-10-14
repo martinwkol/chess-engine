@@ -15,6 +15,11 @@ public:
 
     ZobristHash() { assert(initialized); }
 
+    void SwitchPiece(Square square, Piece piece);
+    void SwitchSideToMove();
+    void SwitchCastlingRights(CastlingRights rights);
+    void SwitchEnPassantFile(BoardFile file);
+    operator HashType() const;
 
 private:
     static bool initialized;
@@ -27,3 +32,26 @@ private:
     HashType mHash = 0;
 
 };
+
+inline void ZobristHash::SwitchPiece(Square square, Piece piece) {
+    assert(IsValid(square));
+    assert(IsValid(piece));
+    mHash ^= pieces[ToInt(square)][ToInt(piece)];
+}
+
+inline void ZobristHash::SwitchSideToMove() {
+    mHash ^= sideToMove;
+}
+
+inline void ZobristHash::SwitchCastlingRights(CastlingRights rights) {
+    mHash ^= castlingRights[rights];
+}
+
+inline void ZobristHash::SwitchEnPassantFile(BoardFile file) {
+    assert(IsValid(file));
+    mHash ^= enPassantFile[ToInt(file)];
+}
+
+inline ZobristHash::operator HashType() const {
+    return mHash;
+}
