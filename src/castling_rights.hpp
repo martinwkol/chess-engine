@@ -3,6 +3,8 @@
 #include <cstdint>
 #include "types.hpp"
 
+constexpr uint8_t CASTLING_RIGHTS_NUM = 16;
+
 class CastlingRights {
 public:
     static constexpr uint8_t WHITE_QUEENSIDE = 1;
