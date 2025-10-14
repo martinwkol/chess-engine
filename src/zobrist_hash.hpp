@@ -24,10 +24,10 @@ public:
 private:
     static bool initialized;
 
-    static std::array<std::array<HashType, PIECE_NUM>, SQUARE_NUM>  pieces;
-    static HashType                                                 sideToMove;
-    static std::array<HashType, CASTLING_RIGHTS_NUM>                castlingRights;
-    static std::array<HashType, BOARD_FILE_NUM>                     enPassantFile;
+    static Array2D<HashType, SQUARE_NUM, PIECE_NUM> pieces;
+    static HashType                                 sideToMove;
+    static Array<HashType, CASTLING_RIGHTS_NUM>     castlingRights;
+    static Array<HashType, BOARD_FILE_NUM>          enPassantFile;
 
     HashType mHash = 0;
 

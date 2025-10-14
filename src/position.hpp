@@ -49,27 +49,27 @@ private:
         Square enPassant;
         CastlingRights castlingRights;
         uint32_t reversableHalfMovesCnt;
-        std::array<Bitboard, COLOR_NUM> attacks;
-        std::array<Bitboard, COLOR_NUM> pinned;
+        Array<Bitboard, COLOR_NUM> attacks;
+        Array<Bitboard, COLOR_NUM> pinned;
         Bitboard kingAttackers;
         Bitboard checkSquares;
     };
 
-    std::array<std::array<Bitboard, PIECE_TYPE_NUM>, COLOR_NUM> mPiecesBB;
-    std::array<Piece, SQUARE_NUM> mBoard;
+    Array2D<Bitboard, COLOR_NUM, PIECE_TYPE_NUM> mPiecesBB;
+    Array<Piece, SQUARE_NUM> mBoard;
     Color mSideToMove                               = Color::White;
     CastlingRights mCastlingRights                  = CastlingRights::ALL;
     Square mEnPassant                               = Square::None;
     uint32_t mReversableHalfMovesCnt                = 0;
     uint32_t mMoveNum                               = 1;
 
-    std::array<Bitboard, COLOR_NUM> mOccupied;
-    std::array<Bitboard, COLOR_NUM> mAttacks;
-    std::array<Bitboard, COLOR_NUM> mPinned;
+    Array<Bitboard, COLOR_NUM> mOccupied;
+    Array<Bitboard, COLOR_NUM> mAttacks;
+    Array<Bitboard, COLOR_NUM> mPinned;
     Bitboard mKingAttackers                         = BB::NONE;
     Bitboard mCheckSquares                          = BB::NONE;
 
-    RestoreInfo mHistory[MAX_HALF_MOVES];
+    Array<RestoreInfo, MAX_HALF_MOVES> mHistory;
     uint32_t mHistoryNext                           = 0;
 
     Bitboard& PiecesBB(Color color, PieceType type) { return mPiecesBB[ToInt(color)][ToInt(type)]; }

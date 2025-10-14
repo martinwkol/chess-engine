@@ -6,16 +6,16 @@
 
 class MoveList {
 public:
-    MoveList(const Position& pos) { mEnd = GenerateMoves(mMoves, pos); }
+    MoveList(const Position& pos) { mEnd = GenerateMoves(mMoves.begin(), pos); }
 
-    Move* begin() { return mMoves; }
-    Move* end() { return mEnd; }
-    const Move* begin() const { return mMoves; }
-    const Move* end() const { return mEnd; }
+    Move* begin()               { return mMoves.begin(); }
+    Move* end()                 { return mEnd; }
+    const Move* begin() const   { return mMoves.begin(); }
+    const Move* end() const     { return mEnd; }
 
 private:
     static constexpr int MAX_NUM_MOVES = 256;
 
-    Move mMoves[MAX_NUM_MOVES];
+    Array<Move, MAX_NUM_MOVES> mMoves;
     Move* mEnd;
 };

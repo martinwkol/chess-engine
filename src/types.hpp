@@ -2,6 +2,18 @@
 
 #include <cstdint>
 #include <cassert>
+#include <array>
+
+
+// Array classes
+
+template <typename T, std::size_t num>
+using Array = std::array<T, num>;
+
+template <typename T, std::size_t num1, std::size_t num2>
+using Array2D = std::array<std::array<T, num2>, num1>;
+
+
 
 /////////////////////////////////////////////////////////
 /////////////////////   DIRECTION   /////////////////////

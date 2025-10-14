@@ -4,10 +4,10 @@
 
 bool ZobristHash::initialized = false;
 
-std::array<std::array<ZobristHash::HashType, PIECE_NUM>, SQUARE_NUM>    ZobristHash::pieces;
-ZobristHash::HashType                                                   ZobristHash::sideToMove;
-std::array<ZobristHash::HashType, CASTLING_RIGHTS_NUM>                  ZobristHash::castlingRights;
-std::array<ZobristHash::HashType, BOARD_FILE_NUM>                       ZobristHash::enPassantFile;
+Array2D<ZobristHash::HashType, SQUARE_NUM, PIECE_NUM> ZobristHash::pieces;
+ZobristHash::HashType                                 ZobristHash::sideToMove;
+Array<ZobristHash::HashType, CASTLING_RIGHTS_NUM>     ZobristHash::castlingRights;
+Array<ZobristHash::HashType, BOARD_FILE_NUM>          ZobristHash::enPassantFile;
 
 void ZobristHash::Init(uint64_t seed) {
     std::mt19937_64 mt(seed);

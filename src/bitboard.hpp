@@ -88,11 +88,11 @@ private:
 
     static bool initialized;
 
-    static Bitboard pseudoAttacks[PIECE_TYPE_NUM][SQUARE_NUM];
-    static Magic rookAttacks[SQUARE_NUM];
-    static Magic bishopAttacks[SQUARE_NUM];
-    static Bitboard between[SQUARE_NUM][SQUARE_NUM];
-    static Bitboard line[SQUARE_NUM][SQUARE_NUM];
+    static Array2D<Bitboard, PIECE_TYPE_NUM, SQUARE_NUM> pseudoAttacks;
+    static Array<Magic, SQUARE_NUM> rookAttacks;
+    static Array<Magic, SQUARE_NUM> bishopAttacks;
+    static Array2D<Bitboard, SQUARE_NUM, SQUARE_NUM> between;
+    static Array2D<Bitboard, SQUARE_NUM, SQUARE_NUM> line;
 
     static void InitPseudoAttacks();
     static void InitMagicBitboards();
