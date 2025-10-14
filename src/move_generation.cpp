@@ -97,14 +97,11 @@ static Move* AddPromotions(Move* list, Bitboard bb) {
 }
 
 template <Color This>
-static bool EnPassantPossible(const Position& pos) {
+static bool EnPassantAllowed(const Position& pos) {
     constexpr Direction Forward = This == Color::White ? Direction::Up : Direction::Down;
 
-    Square enPassant = pos.GetEnPassant();
-    if (enPassant == Square::None) return false;
     if (!pos.IsCheck()) return true;
-
-    Square captured = enPassant - Forward;
+    Square captured = pos.GetEnPassant() - Forward;
     if (pos.GetKingAttackers() & BB::SquareBB(captured)) return true;
     return false;
 }
@@ -170,8 +167,8 @@ static Move* GeneratePawnMoves(Move* list, const Position& pos, Bitboard allowed
     list = AddNormalPawnMoves<Forward + Direction::Left, Move::NewCapture>(list, captureLeft);
     list = AddNormalPawnMoves<Forward + Direction::Right, Move::NewCapture>(list, captureRight);
 
-    if (EnPassantPossible<This>(pos)) {
-        Square enPassant = pos.GetEnPassant();
+    Square enPassant = pos.GetEnPassant();
+    if (enPassant != Square::None && EnPassantAllowed<This>(pos)) {
         Bitboard enPassantingPawns = BB::PawnAttacks<Other>(enPassant) & pawns;
         while (enPassantingPawns) {
             Square from = BB::PopLsb(enPassantingPawns);
