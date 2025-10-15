@@ -9,7 +9,7 @@ void Position::DoMove(Move move) {
     Square from = move.GetFrom();
     Square to = move.GetTo();
 
-    RestoreInfo restoreInfo;
+    RestoreInfo& restoreInfo            = mHistory[mHistoryNext++];
     restoreInfo.move                    = move;
     restoreInfo.capturedPiece           = move.IsCapture() ? GetBoard(to) : Piece::None;
     restoreInfo.enPassant               = mEnPassant;
@@ -20,7 +20,6 @@ void Position::DoMove(Move move) {
     restoreInfo.kingAttackers           = mKingAttackers;
     restoreInfo.checkSquares            = mCheckSquares;
     restoreInfo.zobristHash             = mZobristHash;
-    mHistory[mHistoryNext++] = restoreInfo;
 
     NullifyEnPassant();
 
@@ -67,7 +66,7 @@ void Position::DoMove(Move move) {
 }
 
 void Position::UndoMove() {
-    RestoreInfo restoreInfo = mHistory[--mHistoryNext];
+    RestoreInfo& restoreInfo = mHistory[--mHistoryNext];
 
     Square from = restoreInfo.move.GetFrom();
     Square to = restoreInfo.move.GetTo();
