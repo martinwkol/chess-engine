@@ -7,6 +7,7 @@
 #include <cassert>
 #include <array>
 
+// See https://www.chessprogramming.org/Zobrist_Hashing
 class ZobristHash {
 public:
     using HashType = uint64_t;
