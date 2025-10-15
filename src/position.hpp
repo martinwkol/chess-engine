@@ -4,9 +4,9 @@
 #include "bitboard.hpp"
 #include "castling_rights.hpp"
 #include "move.hpp"
+#include "zobrist_hash.hpp"
 
 #include <string>
-#include <array>
 
 class Position {
 public:
@@ -53,6 +53,7 @@ private:
         Array<Bitboard, COLOR_NUM> pinned;
         Bitboard kingAttackers;
         Bitboard checkSquares;
+        ZobristHash zobristHash;
     };
 
     Array2D<Bitboard, COLOR_NUM, PIECE_TYPE_NUM> mPiecesBB;
@@ -68,6 +69,8 @@ private:
     Array<Bitboard, COLOR_NUM> mPinned;
     Bitboard mKingAttackers                         = BB::NONE;
     Bitboard mCheckSquares                          = BB::NONE;
+
+    ZobristHash mZobristHash;
 
     Array<RestoreInfo, MAX_HALF_MOVES> mHistory;
     uint32_t mHistoryNext                           = 0;
@@ -92,6 +95,10 @@ private:
     void RemovePiece(Square square);
     void MovePiece(Square from, Square to);
     void CapturePiece(Square from, Square to);
+
+    void NullifyEnPassant();
+    void SetEnPassant(Square square);
+    void SwitchSideToMove();
 
     template <Color color>
     void UpdateCastlingRights(Square from, Square to);

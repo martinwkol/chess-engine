@@ -19,14 +19,15 @@ void Position::DoMove(Move move) {
     restoreInfo.pinned                  = mPinned;
     restoreInfo.kingAttackers           = mKingAttackers;
     restoreInfo.checkSquares            = mCheckSquares;
+    restoreInfo.zobristHash             = mZobristHash;
     mHistory[mHistoryNext++] = restoreInfo;
 
-    mEnPassant = Square::None;
+    NullifyEnPassant();
 
     if (move.IsQuiet()) {
         MovePiece(from, to);
         if (move.IsDoublePawnPush()) {
-            mEnPassant = MiddleOf(from, to);
+            SetEnPassant(MiddleOf(from, to));
         }
     }
     else if (move.IsNormalCapture()) {
@@ -61,7 +62,7 @@ void Position::DoMove(Move move) {
     }
     if (GetSideToMove() == Color::Black) ++mMoveNum;
 
-    mSideToMove = ~mSideToMove;
+    SwitchSideToMove();
     UpdateAuxiliaryInfo();
 }
 
@@ -91,6 +92,8 @@ void Position::UndoMove() {
     }
 
     if (restoreInfo.capturedPiece != Piece::None) AddPiece(restoreInfo.capturedPiece, to);
+    if (mSideToMove == Color::White) mMoveNum--;
+    SwitchSideToMove();
 
     mEnPassant              = restoreInfo.enPassant;
     mCastlingRights         = restoreInfo.castlingRights;
@@ -99,9 +102,8 @@ void Position::UndoMove() {
     mPinned                 = restoreInfo.pinned;
     mKingAttackers          = restoreInfo.kingAttackers;
     mCheckSquares           = restoreInfo.checkSquares;
+    mZobristHash            = restoreInfo.zobristHash;
 
-    if (mSideToMove == Color::White) mMoveNum--;
-    mSideToMove = ~mSideToMove;
 }
 
 std::string Position::GetFEN() const {
@@ -226,8 +228,10 @@ const char* Position::InitFromFEN_PiecePosition(const char* fen) {
 
 const char* Position::InitFromFEN_SideToMove(const char* fen) {
     if (!(*fen == 'w' || *fen == 'b')) throw std::invalid_argument("Illegal fen: expected 'w' or 'b' as active color");
-    if (*fen == 'w') mSideToMove = Color::White;
-    else mSideToMove = Color::Black;
+    mSideToMove = Color::White;
+    if (*fen == 'b') {
+        SwitchSideToMove();
+    }
     return fen + 1;
 }
 
@@ -251,6 +255,7 @@ const char* Position::InitFromFEN_CastlingRights(const char* fen) {
         ++fen;
     }
     if (mCastlingRights == CastlingRights::NONE) throw std::invalid_argument("Illegal fen: invalid castling rights");
+    mZobristHash.SwitchCastlingRights(mCastlingRights);
     return fen;
 }
 
@@ -267,6 +272,7 @@ const char *Position::InitFromFEN_EnPassant(const char *fen) {
     if (*fen < '1' || '8' < *fen) throw std::invalid_argument("Illegal fen: invalid en passant");
     BoardRank rank = ToBoardRank(*fen - '1');
     mEnPassant = MakeSquare(file, rank);
+    mZobristHash.SwitchEnPassantFile(file);
     return fen + 1;
 }
 
@@ -294,16 +300,20 @@ void Position::AddPiece(Piece piece, Square square) {
     Board(square)                = piece;
     PiecesBB(piece)             |= squareBB;
     Occupied(ColorOf(piece))    |= squareBB;
+
+    mZobristHash.SwitchPiece(square, piece);
 }
 
 void Position::RemovePiece(Square square) {
     assert(Board(square) != Piece::None);
 
     Bitboard squareBB        = BB::SquareBB(square);
-    Piece old                = Board(square);
+    Piece piece                = Board(square);
     Board(square)            = Piece::None;
-    PiecesBB(old)           ^= squareBB;
-    Occupied(ColorOf(old))  ^= squareBB;
+    PiecesBB(piece)           ^= squareBB;
+    Occupied(ColorOf(piece))  ^= squareBB;
+
+    mZobristHash.SwitchPiece(square, piece);
 }
 
 void Position::MovePiece(Square from, Square to) {
@@ -318,6 +328,9 @@ void Position::MovePiece(Square from, Square to) {
     Board(to)                    = piece;
     PiecesBB(piece)             ^= bothBB;
     Occupied(ColorOf(piece))    ^= bothBB;
+
+    mZobristHash.SwitchPiece(from, piece);
+    mZobristHash.SwitchPiece(to, piece);
 }
 
 void Position::CapturePiece(Square from, Square to) {
@@ -336,6 +349,27 @@ void Position::CapturePiece(Square from, Square to) {
     PiecesBB(capturedPiece)             ^= toBB;
     Occupied(ColorOf(movingPiece))      ^= bothBB;
     Occupied(ColorOf(capturedPiece))    ^= toBB;
+
+    mZobristHash.SwitchPiece(from, movingPiece);
+    mZobristHash.SwitchPiece(to, movingPiece);
+    mZobristHash.SwitchPiece(to, capturedPiece);
+}
+
+void Position::NullifyEnPassant() {
+    assert(mEnPassant != Square::None);
+    mZobristHash.SwitchEnPassantFile(FileOf(mEnPassant));
+    mEnPassant = Square::None;
+}
+
+void Position::SetEnPassant(Square square) {
+    assert(mEnPassant == Square::None);
+    mEnPassant = square;
+    mZobristHash.SwitchEnPassantFile(FileOf(square));
+}
+
+void Position::SwitchSideToMove() {
+    mSideToMove = ~mSideToMove;
+    mZobristHash.SwitchSideToMove();
 }
 
 template <Color color>
@@ -359,6 +393,7 @@ void Position::UpdateCastlingRights(Square from, Square to) {
     Bitboard toBB   = BB::SquareBB(to);
 
     if (BothBB & (fromBB | toBB)) {
+        mZobristHash.SwitchCastlingRights(mCastlingRights);
         if (MySideBB & fromBB) {
             switch (from) {
             case MyQueenRook:       mCastlingRights.ForbidCastlingQueenside<color>(); break;
@@ -375,6 +410,7 @@ void Position::UpdateCastlingRights(Square from, Square to) {
             default:                break;
             }
         }
+        mZobristHash.SwitchCastlingRights(mCastlingRights);
     }
 }
 
