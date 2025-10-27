@@ -110,4 +110,6 @@ private:
     void UpdateKingAttackers();
     void UpdateAuxiliaryInfo();
 
+    bool VerifyZobristHash() const;
+
 };
