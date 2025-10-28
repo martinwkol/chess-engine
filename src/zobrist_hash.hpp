@@ -15,6 +15,7 @@ public:
     static void Init(uint64_t seed = 0);
 
     ZobristHash() { assert(initialized); }
+    ZobristHash(HashType hash) { mHash = hash; }
 
     void SwitchPiece(Square square, Piece piece);
     void SwitchSideToMove();
