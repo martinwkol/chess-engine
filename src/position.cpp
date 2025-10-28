@@ -63,6 +63,8 @@ void Position::DoMove(Move move) {
 
     SwitchSideToMove();
     UpdateAuxiliaryInfo();
+
+    assert(ZobristHashCorrect());
 }
 
 void Position::UndoMove() {
@@ -103,6 +105,7 @@ void Position::UndoMove() {
     mCheckSquares           = restoreInfo.checkSquares;
     mZobristHash            = restoreInfo.zobristHash;
 
+    assert(ZobristHashCorrect());
 }
 
 std::string Position::GetFEN() const {
@@ -185,6 +188,8 @@ void Position::InitFromFEN(const char *fen) {
     fen = InitFromFEN_MoveNum(fen);
 
     UpdateAuxiliaryInfo();
+
+    assert(ZobristHashCorrect());
 }
 
 const char* Position::InitFromFEN_PiecePosition(const char* fen) {
@@ -504,7 +509,7 @@ void Position::UpdateAuxiliaryInfo() {
     UpdateKingAttackers();
 }
 
-bool Position::VerifyZobristHash() const {
+bool Position::ZobristHashCorrect() const {
     ZobristHash hash;
     for (Square square = Square::A1; square <= Square::H8; ++square) {
         Piece piece = GetBoard(square);
