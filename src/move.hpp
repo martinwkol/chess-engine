@@ -6,31 +6,31 @@
 // https://www.chessprogramming.org/Encoding_Moves
 class Move {
 public:
-    static Move NewQuiet(Square from, Square to) {
+    static constexpr Move NewQuiet(Square from, Square to) {
         return Move((ToInt(from) << FROM_SHIFT) | (ToInt(to) << TO_SHIFT));
     }
 
-    static Move NewDoublePawnPush(Square from, Square to) {
+    static constexpr Move NewDoublePawnPush(Square from, Square to) {
         return Move((ToInt(from) << FROM_SHIFT) | (ToInt(to) << TO_SHIFT) | DOUBLE_PAWN_FLAG);
     }
 
-    static Move NewCapture(Square from, Square to) {
+    static constexpr Move NewCapture(Square from, Square to) {
         return Move((ToInt(from) << FROM_SHIFT) | (ToInt(to) << TO_SHIFT) | CAPTURE_FLAG);
     }
 
-    static Move NewEnPassant(Square from, Square to) {
+    static constexpr Move NewEnPassant(Square from, Square to) {
         return Move((ToInt(from) << FROM_SHIFT) | (ToInt(to) << TO_SHIFT) | EN_PASSANT_FLAGS);
     }
 
-    static Move NewKingsideCastle(Square from, Square to) {
+    static constexpr Move NewKingsideCastle(Square from, Square to) {
         return Move((ToInt(from) << FROM_SHIFT) | (ToInt(to) << TO_SHIFT) | KINGSIDE_CASTLE_FLAGS);
     }
     
-    static Move NewQueensideCastle(Square from, Square to) {
+    static constexpr Move NewQueensideCastle(Square from, Square to) {
         return Move((ToInt(from) << FROM_SHIFT) | (ToInt(to) << TO_SHIFT) | QUEENSIDE_CASTLE_FLAGS);
     }
 
-    static Move NewPromotionNormal(Square from, Square to, PieceType type) {
+    static constexpr Move NewPromotionNormal(Square from, Square to, PieceType type) {
         return Move(
             (ToInt(from) << FROM_SHIFT) | (ToInt(to) << TO_SHIFT) | 
             ((ToInt(type) & PROMOTION_TYPE_MASK) << PROMOTION_TYPE_SHIFT) | 
@@ -38,7 +38,7 @@ public:
         );
     }
 
-    static Move NewPromotionCapture(Square from, Square to, PieceType type) {
+    static constexpr Move NewPromotionCapture(Square from, Square to, PieceType type) {
         return Move(
             (ToInt(from) << FROM_SHIFT) | (ToInt(to) << TO_SHIFT) | 
             ((ToInt(type) & PROMOTION_TYPE_MASK) << PROMOTION_TYPE_SHIFT) | 
@@ -46,25 +46,25 @@ public:
         );
     }
 
-    Move() = default;
+    constexpr Move() = default;
 
-    Square GetFrom() const              { return ToSquare((mMove >> FROM_SHIFT) & FROM_MASK); }
-    Square GetTo() const                { return ToSquare((mMove >> TO_SHIFT) & TO_MASK); }
+    constexpr Square GetFrom() const              { return ToSquare((mMove >> FROM_SHIFT) & FROM_MASK); }
+    constexpr Square GetTo() const                { return ToSquare((mMove >> TO_SHIFT) & TO_MASK); }
 
-    bool IsPromotion() const            { return (mMove & PROMOTION_FLAG) != 0; }
-    PieceType GetPromotionType() const  { assert(IsPromotion()); return ToPieceType((mMove >> PROMOTION_TYPE_SHIFT) & PROMOTION_TYPE_MASK); }
+    constexpr bool IsPromotion() const            { return (mMove & PROMOTION_FLAG) != 0; }
+    constexpr PieceType GetPromotionType() const  { assert(IsPromotion()); return ToPieceType((mMove >> PROMOTION_TYPE_SHIFT) & PROMOTION_TYPE_MASK); }
     
-    bool IsCapture() const              { return (mMove & CAPTURE_FLAG) != 0; }
-    bool IsNormalCapture() const        { return (mMove & FLAGS_MASK) == NORMAL_CAPTURE_FLAGS; }
-    bool IsEnPassant() const            { return (mMove & FLAGS_MASK) == EN_PASSANT_FLAGS; }
+    constexpr bool IsCapture() const              { return (mMove & CAPTURE_FLAG) != 0; }
+    constexpr bool IsNormalCapture() const        { return (mMove & FLAGS_MASK) == NORMAL_CAPTURE_FLAGS; }
+    constexpr bool IsEnPassant() const            { return (mMove & FLAGS_MASK) == EN_PASSANT_FLAGS; }
     
-    bool IsCastle() const               { return (mMove & FLAGS_EXCEPT_FIRST) == CASTLE_FLAG; }
-    bool IsKingsideCastle() const       { return (mMove & FLAGS_MASK) == KINGSIDE_CASTLE_FLAGS; }
-    bool IsQueensideCastle() const      { return (mMove & FLAGS_MASK) == QUEENSIDE_CASTLE_FLAGS; }
+    constexpr bool IsCastle() const               { return (mMove & FLAGS_EXCEPT_FIRST) == CASTLE_FLAG; }
+    constexpr bool IsKingsideCastle() const       { return (mMove & FLAGS_MASK) == KINGSIDE_CASTLE_FLAGS; }
+    constexpr bool IsQueensideCastle() const      { return (mMove & FLAGS_MASK) == QUEENSIDE_CASTLE_FLAGS; }
     
-    bool IsDoublePawnPush() const       { return (mMove & FLAGS_MASK) == DOUBLE_PAWN_FLAG; }
+    constexpr bool IsDoublePawnPush() const       { return (mMove & FLAGS_MASK) == DOUBLE_PAWN_FLAG; }
 
-    bool IsQuiet() const                { return (mMove & FLAGS_EXCEPT_FIRST) == 0; }
+    constexpr bool IsQuiet() const                { return (mMove & FLAGS_EXCEPT_FIRST) == 0; }
     
 
 private:
@@ -92,6 +92,6 @@ private:
     
     uint16_t mMove;
 
-    Move(uint16_t move) { mMove = move; }
+    constexpr Move(uint16_t move) { mMove = move; }
 
 };
