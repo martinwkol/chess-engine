@@ -40,7 +40,10 @@ private:
 
 inline void TranspositionTable::AddEntry(Entry entry) {
     Entry& stored = mTable[IndexOf(entry.hash)];
-    if (ShouldOverwrite(stored, entry)) stored = entry;
+    if (ShouldOverwrite(stored, entry)) {
+        stored = entry;
+        stored.age = currentAge;
+    }
 }
 
 inline TranspositionTable::Entry TranspositionTable::GetEntry(ZobristHash hash) {
