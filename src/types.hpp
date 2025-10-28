@@ -287,6 +287,13 @@ constexpr Color operator~(Color color) {
 
 
 
+//////////////////////////////////////////////////////////
+/////////////////////     SCORE     //////////////////////
+//////////////////////////////////////////////////////////
+using Score = int16_t;
+
+
+
 #define DEFINE_ADD_SUB_OPERATORS(T) \
     constexpr T& operator++(T& t)             { t = T(ToInt(t) + 1); return t; } \
     constexpr T& operator--(T& t)             { t = T(ToInt(t) - 1); return t; } \

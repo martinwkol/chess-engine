@@ -503,3 +503,17 @@ void Position::UpdateAuxiliaryInfo() {
     UpdatePins<Color::Black>();
     UpdateKingAttackers();
 }
+
+bool Position::VerifyZobristHash() const {
+    ZobristHash hash;
+    for (Square square = Square::A1; square <= Square::H8; ++square) {
+        Piece piece = GetBoard(square);
+        if (piece != Piece::None) {
+            hash.SwitchPiece(square, piece);
+        }
+    }
+    if (mSideToMove == Color::Black) hash.SwitchSideToMove();
+    hash.SwitchCastlingRights(mCastlingRights);
+    if (mEnPassant != Square::None) hash.SwitchEnPassantFile(FileOf(mEnPassant));
+    return mZobristHash == hash;
+}
