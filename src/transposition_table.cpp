@@ -4,4 +4,5 @@ TranspositionTable::TranspositionTable(uint64_t size) {
     mTable.resize(size, {
 
     });
+    currentAge = 0;
 }
