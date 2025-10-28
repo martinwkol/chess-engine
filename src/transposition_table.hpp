@@ -23,30 +23,24 @@ public:
         uint8_t age;
     };
 
-    explicit TranspositionTable(uint64_t size);
+    explicit TranspositionTable(uint8_t log_2_size);
     void AddEntry(Entry entry);
     Entry GetEntry(ZobristHash hash);
     void NewSearch();
 
 private:
     std::vector<Entry> mTable;
+    ZobristHash::HashType mask;
     uint8_t currentAge;
 
-    std::size_t IndexOf(ZobristHash hash);
-    bool WriteEntry(Entry entry);
+    ZobristHash::HashType IndexOf(ZobristHash hash);
+    bool ShouldOverwrite(Entry oldEntry, Entry newEntry);
 
 };
 
 inline void TranspositionTable::AddEntry(Entry entry) {
-    // TODO: slow because division?
-    std::size_t index = IndexOf(entry.hash);
-    Entry& stored = mTable[index];
-    if (stored.hash != 0) {
-        if (stored.age == currentAge) {
-            if (stored.type != Entry::Type::PV && entry.type == Entry::Type::PV) 
-        }
-    }
-    stored = entry;
+    Entry& stored = mTable[IndexOf(entry.hash)];
+    if (ShouldOverwrite(stored, entry)) stored = entry;
 }
 
 inline TranspositionTable::Entry TranspositionTable::GetEntry(ZobristHash hash) {
@@ -57,7 +51,12 @@ inline void TranspositionTable::NewSearch() {
     ++currentAge;
 }
 
-inline std::size_t TranspositionTable::IndexOf(ZobristHash hash) {
-    // TODO: Slow?
-    return hash % mTable.size();
+inline ZobristHash::HashType TranspositionTable::IndexOf(ZobristHash hash) {
+    return hash & mask;
+}
+
+inline bool TranspositionTable::ShouldOverwrite(Entry oldEntry, Entry newEntry) {
+    if (oldEntry.hash == 0) return true;
+    if (oldEntry.age != currentAge) return true;
+    return oldEntry.depth <= newEntry.depth;
 }
