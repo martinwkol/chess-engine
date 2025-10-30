@@ -67,7 +67,9 @@ inline void TranspositionTable::AddEntry(Entry entry) {
 }
 
 inline TranspositionTable::Entry TranspositionTable::GetEntry(ZobristHash hash) {
-    return mTable[IndexOf(hash)];
+    Entry entry = mTable[IndexOf(hash)];
+    if (entry.GetHash() == hash)    return entry;
+    else                            return Entry();
 }
 
 inline void TranspositionTable::NewSearch() {
