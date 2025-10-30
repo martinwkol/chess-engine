@@ -21,7 +21,7 @@ void Position::DoMove(Move move) {
     restoreInfo.checkSquares            = mCheckSquares;
     restoreInfo.zobristHash             = mZobristHash;
 
-    NullifyEnPassant();
+    if (mEnPassant != Square::None) NullifyEnPassant();
 
     if (move.IsQuiet()) {
         MovePiece(from, to);
