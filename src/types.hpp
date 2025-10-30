@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cassert>
 #include <array>
+#include <limits>
 
 
 // Array classes
@@ -291,6 +292,8 @@ constexpr Color operator~(Color color) {
 /////////////////////     SCORE     //////////////////////
 //////////////////////////////////////////////////////////
 using Score = int16_t;
+constexpr Score SCORE_MIN = std::numeric_limits<Score>::min();
+constexpr Score SCORE_MAX = std::numeric_limits<Score>::max();
 
 
 
