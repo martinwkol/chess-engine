@@ -22,23 +22,33 @@ static Score Negamax(Position& pos, TranspositionTable& table, int depth, Score 
     */
     
     MoveList moves(pos);
+    Score bestScore = SCORE_MIN;
     Move bestMove = Move::NewNone();
     for (Move move : moves) {
         pos.DoMove(move);
         Score score = -Negamax(pos, table, depth - 1, -beta, -alpha);
         pos.UndoMove();
-        if (score > alpha) {
-            alpha = score;
-            bestMove = move;
-            if (alpha > beta) {
-                return alpha;
+        if (score > beta) { // Fail high
+            table.SetEntry(TranspositionTable::Entry(
+                pos.GetZobristHash(), move, score, depth, TranspositionTable::Entry::Type::Fail_High
+            ));
+            return score;
+        }
+        if (score > bestScore) {
+            bestScore = score;
+            if (score > alpha) {
+                alpha = score;
             }
         }
     }
+
+    // Fail low?
+    TranspositionTable::Entry::Type entryType = alpha <= bestScore ? TranspositionTable::Entry::Type::PV : TranspositionTable::Entry::Type::Fail_Low;
+
     table.SetEntry(TranspositionTable::Entry(
-        pos.GetZobristHash(), bestMove, alpha, depth, TranspositionTable::Entry::Type::PV
+        pos.GetZobristHash(), bestMove, bestScore, depth, entryType
     ));
-    return alpha;
+    return bestScore;
 }
 
 void Search(Position& pos, TranspositionTable& table, int depth) {
