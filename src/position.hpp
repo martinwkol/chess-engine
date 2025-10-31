@@ -35,6 +35,8 @@ public:
     Bitboard GetKingAttackers() const           { return mKingAttackers; }
     Bitboard GetCheckSquares() const            { return mCheckSquares; }
 
+    ZobristHash GetZobristHash() const          { return mZobristHash; }
+
     bool IsCheck() const                        { return mKingAttackers != BB::NONE; }
     bool IsDoubleCheck() const                  { return BB::AtLeast2(mKingAttackers); }
 

@@ -44,7 +44,7 @@ public:
     };
 
     explicit TranspositionTable(uint8_t log_2_size);
-    void AddEntry(Entry entry);
+    void SetEntry(Entry entry);
     Entry GetEntry(ZobristHash hash);
     void NewSearch();
 
@@ -58,7 +58,7 @@ private:
 
 };
 
-inline void TranspositionTable::AddEntry(Entry entry) {
+inline void TranspositionTable::SetEntry(Entry entry) {
     Entry& stored = mTable[IndexOf(entry.GetHash())];
     if (ShouldOverwrite(stored, entry)) {
         stored = entry;

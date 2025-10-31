@@ -6,6 +6,10 @@
 // https://www.chessprogramming.org/Encoding_Moves
 class Move {
 public:
+    static constexpr Move NewNone() {
+        return Move(0);
+    }
+
     static constexpr Move NewQuiet(Square from, Square to) {
         return Move((ToInt(from) << FROM_SHIFT) | (ToInt(to) << TO_SHIFT));
     }

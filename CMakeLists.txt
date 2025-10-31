@@ -13,6 +13,7 @@ set(SOURCES
     "${SRC_DIR}/move_generation.cpp"
     "${SRC_DIR}/zobrist_hash.cpp"
     "${SRC_DIR}/transposition_table.cpp"
+    "${SRC_DIR}/search.cpp"
 )
 
 # Define the executable
