@@ -1,13 +1,41 @@
 #include "search.hpp"
-
+#include "evaluate.hpp"
 #include "move_list.hpp"
 
-static Score Quiescence(Position& pos, TranspositionTable& table, int depth, Score alpha, Score beta) {
+static Score Quiescence(Position& pos, Score alpha, Score beta) {
+    Score bestScore = SCORE_MIN;
+    if (!pos.IsCheck()) {
+        // Stand pat
+        bestScore = Evaluate(pos);
+        if (bestScore >= beta) return bestScore;
+        if (bestScore > alpha) alpha = bestScore;
+    }
 
+    MoveList moves(pos);
+    for (Move move : moves) {
+        // TODO: Search for moves that check opponent
+        // TODO: Static exchange evaluation 
+        if (!pos.IsCheck() && !move.IsCapture()) continue;
+        pos.DoMove(move);
+        Score score = -Quiescence(pos, -beta, -alpha);
+        pos.UndoMove();
+
+        if (score >= beta) { // Fail high
+            return score;
+        }
+        if (score > bestScore) {
+            bestScore = score;
+            if (score > alpha) {
+                alpha = score;
+            }
+        }
+    }
+
+    return bestScore;
 }
 
 static Score Negamax(Position& pos, TranspositionTable& table, int depth, Score alpha, Score beta) {
-    if (depth <= 0) return Quiescence(pos, table, depth, alpha, beta);
+    if (depth <= 0) return Quiescence(pos, alpha, beta);
     /*
     Move bestMove = Move::NewNone();
     TranspositionTable::Entry tableEntry = table.GetEntry(pos.GetZobristHash());
@@ -28,7 +56,7 @@ static Score Negamax(Position& pos, TranspositionTable& table, int depth, Score 
         pos.DoMove(move);
         Score score = -Negamax(pos, table, depth - 1, -beta, -alpha);
         pos.UndoMove();
-        if (score > beta) { // Fail high
+        if (score >= beta) { // Fail high
             table.SetEntry(TranspositionTable::Entry(
                 pos.GetZobristHash(), move, score, depth, TranspositionTable::Entry::Type::Fail_High
             ));
